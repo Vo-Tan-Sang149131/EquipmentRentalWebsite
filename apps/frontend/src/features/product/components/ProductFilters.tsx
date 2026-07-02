@@ -63,7 +63,7 @@ export function ProductFilters({
       <div className="flex justify-between">
         <h2 className="font-bold text-lg">Filters</h2>
         <button className="text-sm text-blue-600 font-medium hover:underline cursor-pointer" onClick={resetFilters}>
-          Clear All
+          Xóa bộ lọc
         </button>
       </div>
 

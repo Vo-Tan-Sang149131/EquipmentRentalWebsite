@@ -78,7 +78,7 @@ export function HeaderActions() {
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">Xin chào, {user.username}</p>
                   <p className="pt-2 text-xs leading-none text-muted-foreground">
-                    Quyền: {user.roles.join(', ')}
+                    Quyền: {user.roles?.join(', ')}
                   </p>
                 </div>
               </div>

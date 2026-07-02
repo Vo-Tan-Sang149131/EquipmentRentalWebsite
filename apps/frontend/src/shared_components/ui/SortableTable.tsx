@@ -46,7 +46,7 @@ export default function SortableTable<T>({
 
   return (
     <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-      <div className="min-w-[800px] lg:min-w-full inline-block align-middle">
+      <div className="min-w-200 lg:min-w-full inline-block align-middle">
         <table className="w-full border-collapse">
           <thead className="bg-slate-50/80 border-b border-slate-200 sticky top-0 z-10 backdrop-blur-md">
           <tr>

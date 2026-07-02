@@ -1,4 +1,5 @@
 import apiClient from '@/services/api.ts';
+import type { SpringPageResponse } from '@/features/product/types/product.types.ts';
 import type {
   DeviceForEdit,
   DeviceManage,
@@ -10,8 +11,8 @@ import type {
 
 export const deviceService = {
   // Get owner's device inventory
-  getMyInventory: (): Promise<DeviceManage[]> =>
-    apiClient.get('/devices/my-inventory'),
+  getMyInventory: (page = 0, size = 8): Promise<SpringPageResponse<DeviceManage>> =>
+    apiClient.get(`/devices/my-inventory?page=${page}&size=${size}`),
 
   // Get device detail for edit (owner only)
   getDeviceForEdit: (deviceId: number): Promise<DeviceForEdit> =>
@@ -36,14 +37,16 @@ export const deviceService = {
     }),
 
   // Orders
-  getOwnerOrders: (): Promise<Order[]> => apiClient.get('/orders/owner'),
+  getOwnerOrders: (page = 0, size = 10): Promise<SpringPageResponse<Order>> =>
+    apiClient.get(`/orders/owner?page=${page}&size=${size}`),
   confirmOrder: (orderId: number): Promise<Order> => apiClient.post(`/orders/${orderId}/owner/confirm`, {}),
   rejectOrder: (orderId: number): Promise<Order> => apiClient.post(`/orders/${orderId}/owner/reject`, {}),
   reportIssue: (orderId: number, title: string, description: string): Promise<void> =>
     apiClient.post(`/issues?orderId=${orderId}&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`),
 
   // Reviews
-  getOwnerReviews: (): Promise<Review[]> => apiClient.get('/products/reviews/my'),
+  getOwnerReviews: (page = 0, size = 10): Promise<SpringPageResponse<Review>> =>
+    apiClient.get(`/products/reviews/my?page=${page}&size=${size}`),
 
   // Calendar
   getBlockedDates: (deviceId: number): Promise<string[]> =>

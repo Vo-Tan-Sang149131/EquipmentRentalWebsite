@@ -1,6 +1,7 @@
 package com.example.demo.repository.review;
 
 import com.example.demo.entity.ProductReview;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,14 @@ public interface ProductReviewRepository extends JpaRepository<ProductReview, Lo
         "WHERE d.owner.id = :ownerId " +
         "ORDER BY pr.createdAt DESC")
     List<ProductReview> findByOwnerId(@Param("ownerId") Long ownerId);
+
+    @Query(value = "SELECT pr FROM ProductReview pr " +
+           "JOIN pr.product p " +
+           "JOIN Device d ON d.product.id = p.id " +
+           "WHERE d.owner.id = :ownerId " +
+           "ORDER BY pr.createdAt DESC",
+           countQuery = "SELECT COUNT(pr) FROM ProductReview pr " +
+           "JOIN Device d ON d.product.id = pr.product.id " +
+           "WHERE d.owner.id = :ownerId")
+    Page<ProductReview> findByOwnerIdPaged(@Param("ownerId") Long ownerId, Pageable pageable);
 }

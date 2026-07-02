@@ -41,11 +41,22 @@ public class VnPayPaymentService implements PaymentService {
         // Sử dụng hàm utils lấy IP chuẩn của bạn từ request
         vnpParams.put("vnp_IpAddr", VnPayUtils.getIpAddress(httpServletRequest));
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+//        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+//        vnpParams.put("vnp_CreateDate", formatter.format(cld.getTime()));
+//
+//        cld.add(Calendar.MINUTE, vnPayConfig.getExpireMinutes());
+//        vnpParams.put("vnp_ExpireDate", formatter.format(cld.getTime()));
+
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        formatter.setTimeZone(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
+        String vnp_CreateDate = formatter.format(cld.getTime());
         vnpParams.put("vnp_CreateDate", formatter.format(cld.getTime()));
 
-        cld.add(Calendar.MINUTE, vnPayConfig.getExpireMinutes());
+        cld.add(Calendar.MINUTE, 15);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
         vnpParams.put("vnp_ExpireDate", formatter.format(cld.getTime()));
 
         List<String> fieldNames = new ArrayList<>(vnpParams.keySet());

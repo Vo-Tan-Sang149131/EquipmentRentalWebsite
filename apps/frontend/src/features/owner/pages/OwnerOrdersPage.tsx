@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { deviceService } from '../services/deviceService';
 import type { Order } from '../types/device.types';
+import type { SpringPageResponse } from '@/features/product/types/product.types.ts';
+import ProductPagination from '@/features/product/components/Pagination.tsx';
 import {
   ClipboardList,
   User,
@@ -22,24 +24,36 @@ export default function OwnerOrdersPage() {
   const [reportTitle, setReportTitle] = useState('');
   const [reportDescription, setReportDescription] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const loadOrders = async () => {
+  const fetchPage = useCallback(async (p: number) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await deviceService.getOwnerOrders();
-      setOrders(data || []);
+      const res: SpringPageResponse<Order> = await deviceService.getOwnerOrders(p - 1, 10);
+      setOrders(res.content || []);
+      setTotalPages(res.totalPages);
     } catch (err: any) {
       console.error(err);
       setError(err?.message || 'Không thể tải danh sách đơn hàng.');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadOrders();
-  }, []);
+    fetchPage(page);
+  }, [page, fetchPage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleConfirm = async (orderId: number) => {
     if (!window.confirm('Xác nhận đơn hàng này?')) return;
@@ -231,6 +245,10 @@ export default function OwnerOrdersPage() {
             </div>
           ))}
         </div>
+      )}
+
+      {!loading && orders.length > 0 && (
+        <ProductPagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
       )}
 
       {/* Report Modal */}

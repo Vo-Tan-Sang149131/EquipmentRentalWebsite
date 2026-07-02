@@ -9,6 +9,7 @@ import com.example.demo.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -56,11 +57,14 @@ public class ProductController extends BaseController {
 
     @GetMapping("/reviews/my")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<MyApiResponse<List<ReviewDTO>>> getMyReviews(
+    public ResponseEntity<MyApiResponse<Page<ReviewDTO>>> getMyReviews(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
         @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long ownerId = userDetails.getId();
-        var reviews = productReviewRepository.findByOwnerId(ownerId).stream()
+        var reviewPage = productReviewRepository.findByOwnerIdPaged(ownerId, PageRequest.of(page, size));
+        var dtos = reviewPage.getContent().stream()
             .map(rev -> new ReviewDTO(
                 rev.getId(),
                 rev.getRenter() != null ? rev.getRenter().getUsername() : "Ẩn danh",
@@ -69,7 +73,7 @@ public class ProductController extends BaseController {
                 rev.getCreatedAt()
             ))
             .toList();
-        return createResponse(HttpStatus.OK, 1000, "Success", reviews);
+        return createResponse(HttpStatus.OK, 1000, "Success", new PageImpl<>(dtos, PageRequest.of(page, size), reviewPage.getTotalElements()));
     }
 
 }

@@ -1,18 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { deviceService } from '../services/deviceService';
 import type { Review } from '../types/device.types';
+import type { SpringPageResponse } from '@/features/product/types/product.types.ts';
+import ProductPagination from '@/features/product/components/Pagination.tsx';
 import { Star, MessageSquare, Calendar, Quote } from 'lucide-react';
 
 export default function OwnerReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    deviceService.getOwnerReviews()
-      .then(res => setReviews(res as unknown as Review[]))
+  const fetchPage = useCallback((p: number) => {
+    setLoading(true);
+    deviceService.getOwnerReviews(p - 1, 10)
+      .then((res: SpringPageResponse<Review>) => {
+        setReviews(res.content);
+        setTotalPages(res.totalPages);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchPage(page);
+  }, [page, fetchPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-6 pb-12">
@@ -78,6 +95,9 @@ export default function OwnerReviewsPage() {
             </div>
           ))}
         </div>
+      )}
+      {!loading && reviews.length > 0 && (
+        <ProductPagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
       )}
     </div>
   );

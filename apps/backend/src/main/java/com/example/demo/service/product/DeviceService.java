@@ -19,7 +19,10 @@ import com.example.demo.repository.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -290,8 +293,24 @@ public class DeviceService {
     @Transactional(readOnly = true)
     public List<DeviceManageResponse> getDevicesByOwner(Long ownerId) {
         List<Device> myDevices = deviceRepository.findByOwnerId(ownerId);
-
         return getDeviceManageResponses(myDevices);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DeviceManageResponse> getDevicesByOwnerPaged(Long ownerId, Pageable pageable) {
+        Page<Device> devicePage = deviceRepository.findByOwnerIdPaged(ownerId, pageable);
+        List<DeviceManageResponse> responses = devicePage.getContent().stream().map(device -> {
+            List<DeviceImageRequest> allImages = device.getDeviceImages().stream()
+                .map(img -> new DeviceImageRequest(img.getImageUrl(), img.getImageType().name()))
+                .toList();
+            return new DeviceManageResponse(
+                device.getId(), device.getProduct().getId(), device.getProduct().getName(),
+                device.getSerialNumber(), device.getConditionPercent(),
+                device.getPricePerDay(), device.getDepositValue(),
+                device.getStatus().name(), allImages
+            );
+        }).toList();
+        return new PageImpl<>(responses, pageable, devicePage.getTotalElements());
     }
 
     @NonNull

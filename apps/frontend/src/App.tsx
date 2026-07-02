@@ -25,6 +25,7 @@ import { CartPage } from '@/features/cart/pages/CartPage.tsx';
 import { BankTransferPage } from '@/features/checkout/pages/BankTransferPage.tsx';
 import { CheckoutSuccessPage } from '@/features/checkout/pages/Checkout SuccessPage.tsx';
 import { CheckoutPage } from '@/features/checkout/pages/CheckoutPage.tsx';
+import { VnPayCallbackPage } from '@/features/checkout/pages/VnPayCallbackPage.tsx';
 import { DashboardLayout } from '@/components/layout/DashboardLayout.tsx';
 import AdminDashboard from '@/features/admin/pages/AdminDashboard.tsx';
 import AdminCategoriesPage from '@/features/admin/pages/AdminCategoriesPage.tsx';
@@ -53,6 +54,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/checkout/bank-transfer" element={<BankTransferPage />} />
           <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+          <Route path="/checkout/vnpay-callback" element={<VnPayCallbackPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/messages" element={<MessagePage />} />
         </Route>

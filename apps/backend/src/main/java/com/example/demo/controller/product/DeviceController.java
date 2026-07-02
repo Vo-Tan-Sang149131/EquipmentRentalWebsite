@@ -10,6 +10,8 @@ import com.example.demo.dto.product.device.response.DeviceManageResponse;
 import com.example.demo.security.CustomUserDetails;
 import com.example.demo.service.product.DeviceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,11 +40,13 @@ public class DeviceController extends BaseController {
 
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/my-inventory")
-    public ResponseEntity<MyApiResponse<List<DeviceManageResponse>>> getMyInventory(
-        @AuthenticationPrincipal CustomUserDetails userDetails // Retrieve owner ID from a security context
+    public ResponseEntity<MyApiResponse<Page<DeviceManageResponse>>> getMyInventory(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long ownerId = userDetails.getId();
-        List<DeviceManageResponse> inventory = deviceService.getDevicesByOwner(ownerId);
+        Page<DeviceManageResponse> inventory = deviceService.getDevicesByOwnerPaged(ownerId, PageRequest.of(page, size));
         return createResponse(HttpStatus.OK, 1000, "Fetch owner inventory successfully", inventory);
     }
 

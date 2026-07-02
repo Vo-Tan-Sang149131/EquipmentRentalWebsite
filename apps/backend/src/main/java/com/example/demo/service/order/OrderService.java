@@ -18,6 +18,9 @@ import com.example.demo.service.payment.PaymentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,25 +127,14 @@ public class OrderService {
     @Transactional(readOnly = true)
     public java.util.List<com.example.demo.dto.order.response.OrderSummaryResponse> getOrdersForOwner(Long ownerId) {
         var orders = orderRepository.findOrdersByOwnerId(ownerId);
+        return orders.stream().map(o -> buildOrderSummaryResponse(o, ownerId)).toList();
+    }
 
-        return orders.stream().map(o -> {
-            var deviceNames = o.getOrderDetails().stream()
-                .filter(od -> od.getDevice().getOwner().getId().equals(ownerId))
-                .map(od -> od.getDevice().getProduct().getName())
-                .toList();
-
-            return com.example.demo.dto.order.response.OrderSummaryResponse.builder()
-                .orderId(o.getId())
-                .status(o.getStatus().name())
-                .startDate(o.getStartDate())
-                .endDate(o.getEndDate())
-                .totalPrice(o.getTotalPrice())
-                .renterUsername(o.getRenter() != null ? o.getRenter().getUsername() : "Unknown")
-                .renterPhone(o.getRenter() != null ? o.getRenter().getPhoneNumber() : "")
-                .renterEmail(o.getRenter() != null ? o.getRenter().getEmail() : "")
-                .deviceNames(deviceNames)
-                .build();
-        }).toList();
+    @Transactional(readOnly = true)
+    public Page<com.example.demo.dto.order.response.OrderSummaryResponse> getOrdersForOwnerPaged(Long ownerId, Pageable pageable) {
+        var orderPage = orderRepository.findOrdersByOwnerIdPaged(ownerId, pageable);
+        var responses = orderPage.getContent().stream().map(o -> buildOrderSummaryResponse(o, ownerId)).toList();
+        return new PageImpl<>(responses, pageable, orderPage.getTotalElements());
     }
 
     @Transactional

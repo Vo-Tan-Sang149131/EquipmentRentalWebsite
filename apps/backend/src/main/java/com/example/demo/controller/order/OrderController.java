@@ -9,6 +9,8 @@ import com.example.demo.service.order.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,12 +39,14 @@ public class OrderController extends BaseController {
 
     @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/owner")
-    public ResponseEntity<MyApiResponse<java.util.List<com.example.demo.dto.order.response.OrderSummaryResponse>>> getOrdersForOwner(
+    public ResponseEntity<MyApiResponse<Page<com.example.demo.dto.order.response.OrderSummaryResponse>>> getOrdersForOwner(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
         @AuthenticationPrincipal com.example.demo.security.CustomUserDetails userDetails
     ) {
         Long ownerId = userDetails.getId();
-        var list = orderService.getOrdersForOwner(ownerId);
-        return createResponse(HttpStatus.OK, 1000, "Fetch owner orders successfully", list);
+        var result = orderService.getOrdersForOwnerPaged(ownerId, PageRequest.of(page, size));
+        return createResponse(HttpStatus.OK, 1000, "Fetch owner orders successfully", result);
     }
 
     @PreAuthorize("hasRole('OWNER')")

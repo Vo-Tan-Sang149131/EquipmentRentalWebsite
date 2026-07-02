@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { deviceService } from '../services/deviceService.ts';
 import type { DeviceManage } from '../types/device.types.ts';
+import type { SpringPageResponse } from '@/features/product/types/product.types.ts';
+import ProductPagination from '@/features/product/components/Pagination.tsx';
 import { Package, Plus, Search, Edit2, AlertCircle, Camera, Banknote, ShieldCheck, Clock } from 'lucide-react';
 
 export default function InventoryPage() {
@@ -9,11 +11,15 @@ export default function InventoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    deviceService.getMyInventory()
-      .then((data) => {
-        setItems(data);
+  const fetchPage = useCallback((p: number) => {
+    setLoading(true);
+    deviceService.getMyInventory(p - 1, 8)
+      .then((res: SpringPageResponse<DeviceManage>) => {
+        setItems(res.content);
+        setTotalPages(res.totalPages);
         setError(null);
       })
       .catch(err => {
@@ -22,6 +28,15 @@ export default function InventoryPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    fetchPage(page);
+  }, [page, fetchPage]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -35,6 +50,10 @@ export default function InventoryPage() {
         return 'bg-gray-50 text-gray-700 border-gray-100';
     }
   };
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const filteredItems = items.filter(item =>
     item.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,6 +186,9 @@ export default function InventoryPage() {
             </div>
           ))}
         </div>
+      )}
+      {!loading && items.length > 0 && (
+        <ProductPagination currentPage={page} totalPages={totalPages} onPageChange={handlePageChange} />
       )}
     </div>
   );

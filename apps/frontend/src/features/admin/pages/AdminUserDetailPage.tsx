@@ -27,10 +27,12 @@ export default function AdminUserDetailPage() {
     }
 
     adminService.getUserDetail(userId)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((data: any) => {
         const resolvedData = data as User;
         setUser(resolvedData);
         // data.roles might be an array of strings or a Set depending on the response
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setSelectedRoles(new Set((resolvedData as any).roles || []));
       })
       .catch(err => {
@@ -137,6 +139,7 @@ export default function AdminUserDetailPage() {
             </div>
             <div className="truncate">
               <h3 className="font-bold text-slate-900 truncate">{user.fullName || 'Chưa cập nhật'}</h3>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               <p className="text-xs text-slate-500">ID tài khoản: #{user.userId || (user as any).id}</p>
             </div>
           </div>

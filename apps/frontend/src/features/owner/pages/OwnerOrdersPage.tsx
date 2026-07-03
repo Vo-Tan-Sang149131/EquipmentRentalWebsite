@@ -34,6 +34,8 @@ export default function OwnerOrdersPage() {
       const res: SpringPageResponse<Order> = await deviceService.getOwnerOrders(p - 1, 10);
       setOrders(res.content || []);
       setTotalPages(res.totalPages);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       setError(err?.message || 'Không thể tải danh sách đơn hàng.');
@@ -61,6 +63,7 @@ export default function OwnerOrdersPage() {
     try {
       const response = await deviceService.confirmOrder(orderId);
       setOrders(orders.map(o => o.orderId === orderId ? response : o));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       alert(err?.message || 'Không thể xác nhận đơn hàng.');
@@ -76,6 +79,7 @@ export default function OwnerOrdersPage() {
     try {
       const response = await deviceService.rejectOrder(orderId);
       setOrders(orders.map(o => o.orderId === orderId ? response : o));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       alert(err?.message || 'Không thể từ chối đơn hàng.');
@@ -94,6 +98,7 @@ export default function OwnerOrdersPage() {
       setIsReportModalOpen(false);
       setReportTitle('');
       setReportDescription('');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       alert(err?.message || 'Không thể gửi báo cáo.');

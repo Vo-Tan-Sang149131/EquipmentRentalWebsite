@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useDeviceEdit } from '../hooks/useDeviceEdit.ts';
 import type { DeviceUpdatePayload } from '../types/device.types.ts';
@@ -66,15 +66,14 @@ export default function OwnerDeviceEditPage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await apiClient.post('/uploads', formData, {
+      const imageUrl = await apiClient.post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      const imageUrl = response; // apiClient returns data directly
+      }); // apiClient returns data directly
       if (typeof imageUrl === 'string') {
         await addImage(imageUrl);
         alert('Image uploaded successfully');
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       alert(err?.message || 'Failed to upload image');

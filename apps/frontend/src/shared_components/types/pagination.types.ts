@@ -4,6 +4,7 @@ export interface PaginationParams {
   pageSize: number;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   filters?: Record<string, any>;
 }
 

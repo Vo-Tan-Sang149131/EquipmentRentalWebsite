@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ownerPaymentService } from '../services/owner-payment.service';
 import type { OwnerPayment, OwnerPaymentStats } from '../types/owner-payment.types';
-import { DollarSign, ArrowUpRight, CreditCard, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowUpRight, CreditCard, TrendingUp, Wallet } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
   PENDING: 'bg-yellow-100 text-yellow-800',
@@ -10,7 +10,7 @@ const statusColors: Record<string, string> = {
   REFUNDED: 'bg-purple-100 text-purple-800',
 };
 
-export default function OwnerPaymentsPage() {
+export function OwnerPaymentsPage() {
   const [payments, setPayments] = useState<OwnerPayment[]>([]);
   const [stats, setStats] = useState<OwnerPaymentStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +25,7 @@ export default function OwnerPaymentsPage() {
         ]);
         setPayments(paymentsData);
         setStats(statsData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err?.message || 'Failed to load payment data');
       } finally {
@@ -36,7 +37,13 @@ export default function OwnerPaymentsPage() {
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading payments...</div>;
 
-  const StatCard = ({ title, value, icon: Icon, color }: { title: string; value: string; icon: any; color: string }) => (
+  const StatCard = ({ title, value, icon: Icon, color }: {
+    title: string;
+    value: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon: any;
+    color: string
+  }) => (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <div className="flex items-start justify-between">
         <div>
@@ -59,46 +66,53 @@ export default function OwnerPaymentsPage() {
 
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Total Earnings" value={`$${stats.totalEarnings.toFixed(2)}`} icon={TrendingUp} color="bg-green-500" />
-          <StatCard title="Pending Payout" value={`$${stats.pendingPayout.toFixed(2)}`} icon={Wallet} color="bg-amber-500" />
+          <StatCard title="Total Earnings" value={`$${stats.totalEarnings.toFixed(2)}`} icon={TrendingUp}
+                    color="bg-green-500" />
+          <StatCard title="Pending Payout" value={`$${stats.pendingPayout.toFixed(2)}`} icon={Wallet}
+                    color="bg-amber-500" />
           <StatCard title="Completed" value={String(stats.completedPayments)} icon={CreditCard} color="bg-blue-500" />
-          <StatCard title="Transactions" value={String(stats.totalTransactions)} icon={ArrowUpRight} color="bg-indigo-500" />
+          <StatCard title="Transactions" value={String(stats.totalTransactions)} icon={ArrowUpRight}
+                    color="bg-indigo-500" />
         </div>
       )}
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="text-left px-4 py-3 font-medium">ID</th>
-              <th className="text-left px-4 py-3 font-medium">Order</th>
-              <th className="text-left px-4 py-3 font-medium">Device</th>
-              <th className="text-left px-4 py-3 font-medium">Renter</th>
-              <th className="text-left px-4 py-3 font-medium">Amount</th>
-              <th className="text-left px-4 py-3 font-medium">Method</th>
-              <th className="text-left px-4 py-3 font-medium">Status</th>
-              <th className="text-left px-4 py-3 font-medium">Date</th>
-            </tr>
+          <tr>
+            <th className="text-left px-4 py-3 font-medium">ID</th>
+            <th className="text-left px-4 py-3 font-medium">Order</th>
+            <th className="text-left px-4 py-3 font-medium">Device</th>
+            <th className="text-left px-4 py-3 font-medium">Renter</th>
+            <th className="text-left px-4 py-3 font-medium">Amount</th>
+            <th className="text-left px-4 py-3 font-medium">Method</th>
+            <th className="text-left px-4 py-3 font-medium">Status</th>
+            <th className="text-left px-4 py-3 font-medium">Date</th>
+          </tr>
           </thead>
           <tbody>
-            {payments.length === 0 ? (
-              <tr><td colSpan={8} className="text-center py-8 text-gray-400">No payment transactions found.</td></tr>
-            ) : (
-              payments.map(p => (
-                <tr key={p.paymentId} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-3">#{p.paymentId}</td>
-                  <td className="px-4 py-3">#{p.orderId}</td>
-                  <td className="px-4 py-3">{p.deviceName}</td>
-                  <td className="px-4 py-3">{p.renterName}</td>
-                  <td className="px-4 py-3 font-medium">${p.amount.toFixed(2)}</td>
-                  <td className="px-4 py-3">{p.paymentMethod}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[p.status] || 'bg-gray-100'}`}>{p.status}</span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{new Date(p.paidAt || p.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))
-            )}
+          {payments.length === 0 ? (
+            <tr>
+              <td colSpan={8} className="text-center py-8 text-gray-400">No payment transactions found.</td>
+            </tr>
+          ) : (
+            payments.map(p => (
+              <tr key={p.paymentId} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-3">#{p.paymentId}</td>
+                <td className="px-4 py-3">#{p.orderId}</td>
+                <td className="px-4 py-3">{p.deviceName}</td>
+                <td className="px-4 py-3">{p.renterName}</td>
+                <td className="px-4 py-3 font-medium">${p.amount.toFixed(2)}</td>
+                <td className="px-4 py-3">{p.paymentMethod}</td>
+                <td className="px-4 py-3">
+                  <span
+                    className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[p.status] || 'bg-gray-100'}`}>{p.status}</span>
+                </td>
+                <td
+                  className="px-4 py-3 text-xs text-gray-500">{new Date(p.paidAt || p.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))
+          )}
           </tbody>
         </table>
       </div>

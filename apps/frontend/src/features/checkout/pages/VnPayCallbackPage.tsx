@@ -9,9 +9,9 @@ export function VnPayCallbackPage() {
 
   useEffect(() => {
     const vnp_ResponseCode = searchParams.get('vnp_ResponseCode');
-    const vnp_TransactionNo = searchParams.get('vnp_TransactionNo');
-    const vnp_TxnRef = searchParams.get('vnp_TxnRef');
-    const vnp_Amount = searchParams.get('vnp_Amount');
+    // const vnp_TransactionNo = searchParams.get('vnp_TransactionNo');
+    // const vnp_TxnRef = searchParams.get('vnp_TxnRef');
+    // const vnp_Amount = searchParams.get('vnp_Amount');
 
     if (vnp_ResponseCode === '00') {
       setStatus('success');
@@ -39,7 +39,7 @@ export function VnPayCallbackPage() {
           <h1 className="text-3xl font-bold text-slate-800">Thanh toán thành công!</h1>
           <p className="text-gray-500">Mã giao dịch: {searchParams.get('vnp_TransactionNo')}</p>
           <button onClick={() => navigate('/profile')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
             Xem lịch sử đơn hàng
           </button>
         </>
@@ -51,7 +51,7 @@ export function VnPayCallbackPage() {
           <h1 className="text-3xl font-bold text-slate-800">Thanh toán thất bại</h1>
           <p className="text-gray-500">Mã lỗi: {searchParams.get('vnp_ResponseCode')}</p>
           <button onClick={() => navigate('/checkout')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold">
             Thử lại
           </button>
         </>

@@ -24,6 +24,7 @@ export default function AdminDashboard() {
       try {
         const data = await adminService.getStats();
         setStats(data as unknown as DashboardStats);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error(err);
         setError('Không thể tải dữ liệu thống kê hệ thống.');
@@ -37,6 +38,7 @@ export default function AdminDashboard() {
   const StatCard = ({ title, value, icon: Icon, color, trend }: {
     title: string;
     value: number | string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: any;
     color: string;
     trend?: string

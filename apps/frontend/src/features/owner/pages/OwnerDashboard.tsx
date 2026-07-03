@@ -14,6 +14,7 @@ export default function OwnerDashboard() {
       try {
         const data = await deviceService.getOwnerStats();
         setStats(data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         console.error(err);
         setError('Không thể tải dữ liệu thống kê bảng điều khiển.');
@@ -27,6 +28,7 @@ export default function OwnerDashboard() {
   const StatCard = ({ title, value, icon: Icon, color, trend }: {
     title: string;
     value: number | string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     icon: any;
     color: string;
     trend?: string

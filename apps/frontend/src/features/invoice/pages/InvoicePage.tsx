@@ -13,7 +13,7 @@ const statusColors: Record<string, string> = {
   OVERDUE: 'bg-orange-100 text-orange-800',
 };
 
-export default function InvoicePage() {
+export function InvoicePage() {
   const [invoices, setInvoices] = useState<InvoiceResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +25,7 @@ export default function InvoicePage() {
       try {
         const data = await invoiceService.getMyInvoices();
         setInvoices(data);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         setError(err?.message || 'Failed to load invoices');
       } finally {
@@ -35,7 +36,7 @@ export default function InvoicePage() {
   }, []);
 
   const filtered = invoices.filter(inv =>
-    !search || String(inv.orderId).includes(search)
+    !search || String(inv.orderId).includes(search),
   );
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading invoices...</div>;
@@ -44,7 +45,8 @@ export default function InvoicePage() {
     const inv = selected;
     return (
       <div className="max-w-4xl mx-auto">
-        <button onClick={() => setSelected(null)} className="flex items-center gap-2 text-blue-600 hover:underline mb-4 text-sm">
+        <button onClick={() => setSelected(null)}
+                className="flex items-center gap-2 text-blue-600 hover:underline mb-4 text-sm">
           <ArrowLeft className="w-4 h-4" /> Back to invoices
         </button>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -53,7 +55,8 @@ export default function InvoicePage() {
               <h1 className="text-2xl font-bold">Invoice #{inv.orderId}</h1>
               <p className="text-gray-500 text-sm">Created: {new Date(inv.createdAt).toLocaleDateString()}</p>
             </div>
-            <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[inv.orderStatus] || 'bg-gray-100'}`}>
+            <span
+              className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[inv.orderStatus] || 'bg-gray-100'}`}>
               {inv.orderStatus.replace(/_/g, ' ')}
             </span>
           </div>
@@ -70,11 +73,25 @@ export default function InvoicePage() {
 
           <h2 className="text-lg font-semibold mb-3">Items</h2>
           <table className="w-full text-sm mb-6">
-            <thead><tr className="border-b text-left"><th className="pb-2">Device</th><th className="pb-2">Price/Day</th><th className="pb-2">Days</th><th className="pb-2">Deposit</th><th className="pb-2 text-right">Subtotal</th></tr></thead>
+            <thead>
+            <tr className="border-b text-left">
+              <th className="pb-2">Device</th>
+              <th className="pb-2">Price/Day</th>
+              <th className="pb-2">Days</th>
+              <th className="pb-2">Deposit</th>
+              <th className="pb-2 text-right">Subtotal</th>
+            </tr>
+            </thead>
             <tbody>
-              {inv.items.map((item, i) => (
-                <tr key={i} className="border-b"><td className="py-2">{item.deviceName}</td><td>${item.pricePerDay.toFixed(2)}</td><td>{item.rentalDays}</td><td>${item.depositAmount.toFixed(2)}</td><td className="text-right">${item.subtotal.toFixed(2)}</td></tr>
-              ))}
+            {inv.items.map((item, i) => (
+              <tr key={i} className="border-b">
+                <td className="py-2">{item.deviceName}</td>
+                <td>${item.pricePerDay.toFixed(2)}</td>
+                <td>{item.rentalDays}</td>
+                <td>${item.depositAmount.toFixed(2)}</td>
+                <td className="text-right">${item.subtotal.toFixed(2)}</td>
+              </tr>
+            ))}
             </tbody>
           </table>
 
@@ -84,11 +101,23 @@ export default function InvoicePage() {
             <>
               <h2 className="text-lg font-semibold mb-3">Payments</h2>
               <table className="w-full text-sm">
-                <thead><tr className="border-b text-left"><th className="pb-2">Method</th><th className="pb-2">Amount</th><th className="pb-2">Status</th><th className="pb-2">Date</th></tr></thead>
+                <thead>
+                <tr className="border-b text-left">
+                  <th className="pb-2">Method</th>
+                  <th className="pb-2">Amount</th>
+                  <th className="pb-2">Status</th>
+                  <th className="pb-2">Date</th>
+                </tr>
+                </thead>
                 <tbody>
-                  {inv.payments.map((p, i) => (
-                    <tr key={i} className="border-b"><td className="py-2">{p.paymentMethod}</td><td>${p.amount.toFixed(2)}</td><td>{p.status}</td><td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString() : '-'}</td></tr>
-                  ))}
+                {inv.payments.map((p, i) => (
+                  <tr key={i} className="border-b">
+                    <td className="py-2">{p.paymentMethod}</td>
+                    <td>${p.amount.toFixed(2)}</td>
+                    <td>{p.status}</td>
+                    <td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString() : '-'}</td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
             </>
@@ -129,12 +158,13 @@ export default function InvoicePage() {
         <div className="space-y-4">
           {filtered.map(inv => (
             <div key={inv.orderId} onClick={() => setSelected(inv)}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition cursor-pointer flex items-center justify-between"
+                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition cursor-pointer flex items-center justify-between"
             >
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <h3 className="font-semibold">Invoice #{inv.orderId}</h3>
-                  <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[inv.orderStatus] || 'bg-gray-100'}`}>
+                  <span
+                    className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[inv.orderStatus] || 'bg-gray-100'}`}>
                     {inv.orderStatus.replace(/_/g, ' ')}
                   </span>
                 </div>

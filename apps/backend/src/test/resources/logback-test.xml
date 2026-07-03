@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Tắt chế độ debug của logback để log test sạch sẽ -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+  <!-- Chỉ dùng Appender Console cho môi trường Test -->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level [%X{traceId}] %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Áp dụng Console cho toàn bộ các package -->
+  <root level="INFO">
+    <appender-ref ref="Console"/>
+  </root>
+
+  <!-- Nếu muốn xem chi tiết lỗi Hibernate hoặc Security khi test bị fail -->
+  <logger name="org.springframework.security" level="DEBUG"/>
+  <logger name="org.hibernate.SQL" level="DEBUG"/>
+</configuration>

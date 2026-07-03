@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { api } from '@/services/api';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useQueryClient } from '@tanstack/react-query';
 import type {
   ForgotPasswordRequest,
   LoginRequest,
@@ -85,6 +86,28 @@ export const useRegisterMutation = () => {
     },
   });
 };
+
+
+export const useLogoutMutation = () => {
+  const queryClient = useQueryClient(); // Lấy queryClient
+  const logoutSuccess = useAuthStore((state) => state.logoutSuccess);
+
+  return useMutation({
+    mutationFn: async () => await api.auth.logout(),
+    onSettled: () => {
+      // 1. Xóa sạch cache của React Query
+      queryClient.clear();
+
+      // 2. Dọn dẹp Zustand
+      logoutSuccess();
+
+      // 3. Thông báo và điều hướng
+      toast.success('Đăng xuất thành công.');
+      window.location.href = '/login';
+    },
+  });
+};
+
 
 export const useForgotPasswordMutation = () => {
   const navigate = useNavigate();

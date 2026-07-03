@@ -33,7 +33,7 @@ spring:
     validate-on-migrate: true
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:equipment_rental_db}?createDatabaseIfNotExist=true&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:equipment_rental_db}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -122,7 +122,6 @@ vnpay:
   orderType: other
   expireMinutes: 60
 
-
 momo:
   enabled: true
   partner-code: ${MOMO_PARTNER_CODE:your-partner-code}
@@ -162,10 +161,9 @@ logging:
   level:
     root: ${LOG_LEVEL:INFO}
     '[com.example]': ${APP_LOG_LEVEL:INFO}
-    org.springframework.jdbc.datasource: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.web: DEBUG
-    org.flywaydb: DEBUG
+    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:INFO}
+    org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
+    org.flywaydb: ${FLYWAY_LOG_LEVEL:INFO}
   pattern:
     console: '%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
 

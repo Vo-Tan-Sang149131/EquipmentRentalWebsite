@@ -2,7 +2,7 @@ package com.example.demo.controller.product;
 
 import com.example.demo.controller.BaseController;
 import com.example.demo.dto.MyApiResponse;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

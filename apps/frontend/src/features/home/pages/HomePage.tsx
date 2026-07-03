@@ -15,7 +15,9 @@ export function HomePage() {
     queryFn: () => productService.getCategories(),
   });
 
+
   const products = productsData?.content || [];
+  console.log('products', products);
   const categories = categoriesData || [];
 
   return (
@@ -164,7 +166,7 @@ export function HomePage() {
                           {new Intl.NumberFormat('vi-VN', {
                             style: 'currency',
                             currency: 'VND',
-                          }).format(product.basePrice)}
+                          }).format(product.minPricePerDay)}
                           <span className="text-xs text-slate-400 font-normal">/ngày</span>
                         </p>
                       </div>

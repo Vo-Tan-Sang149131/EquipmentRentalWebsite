@@ -74,7 +74,7 @@ export default function ProductCatalogPage() {
         {/* Desktop Sidebar / Mobile Drawer */}
         <div className={`
           ${isFilterOpen ? 'fixed inset-0 z-50' : 'hidden'}
-          lg:relative lg:inset-auto lg:z-0 lg:block lg:w-72 flex-shrink-0
+          lg:relative lg:inset-auto lg:z-0 lg:block lg:w-72 shrink-0
         `}>
           {/* Mobile Backdrop */}
           <div className="absolute inset-0 bg-slate-900/50 lg:hidden backdrop-blur-sm"

@@ -4,7 +4,7 @@ import com.example.demo.controller.BaseController;
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.order.request.CheckoutRequest;
 import com.example.demo.dto.order.response.CheckoutResponse;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.order.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -42,7 +42,7 @@ public class OrderController extends BaseController {
     public ResponseEntity<MyApiResponse<Page<com.example.demo.dto.order.response.OrderSummaryResponse>>> getOrdersForOwner(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size,
-        @AuthenticationPrincipal com.example.demo.security.CustomUserDetails userDetails
+        @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         Long ownerId = userDetails.getId();
         var result = orderService.getOrdersForOwnerPaged(ownerId, PageRequest.of(page, size));

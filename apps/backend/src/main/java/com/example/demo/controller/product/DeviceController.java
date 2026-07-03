@@ -7,7 +7,7 @@ import com.example.demo.dto.product.device.request.DeviceUpdateRequest;
 import com.example.demo.dto.product.device.response.DeviceEditResponse;
 import com.example.demo.dto.product.device.response.DeviceDetailResponse;
 import com.example.demo.dto.product.device.response.DeviceManageResponse;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.product.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

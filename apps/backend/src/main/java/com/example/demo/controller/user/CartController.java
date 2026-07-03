@@ -4,7 +4,7 @@ import com.example.demo.controller.BaseController;
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.cart.request.CartItemRequest;
 import com.example.demo.dto.cart.response.CartResponse;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.user.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

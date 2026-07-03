@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+// @/features/chat/pages/MessagePage.tsx
+import { useEffect, useState } from 'react'; // Thêm useState
 import { useSearchParams, Link } from 'react-router-dom';
 import { useChatStore } from '../store/useChatStore';
 import ChatLayout from '@/features/chat/components/ChatLayout.tsx';
@@ -9,9 +10,13 @@ export function MessagePage() {
   const { selectRoom, rooms, fetchRooms } = useChatStore();
   const roomIdFromUrl = searchParams.get('room');
 
+  // Thêm một state để biết khi nào trang đã tải xong danh sách phòng lần đầu
+  const [isFirstLoadDone, setIsFirstLoadDone] = useState(false);
+
   useEffect(() => {
-    fetchRooms().then(r => {
-      console.log(r);
+    // Đợi fetchRooms chạy xong xuôi rồi mới tắt trạng thái loading ban đầu
+    fetchRooms().finally(() => {
+      setIsFirstLoadDone(true);
     });
   }, [fetchRooms]);
 
@@ -23,6 +28,14 @@ export function MessagePage() {
       }
     }
   }, [roomIdFromUrl, selectRoom]);
+
+  if (!isFirstLoadDone) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-20 flex items-center justify-center text-sm text-muted-foreground">
+        Đang tải danh sách cuộc trò chuyện...
+      </div>
+    );
+  }
 
   if (rooms.length === 0 && !roomIdFromUrl) {
     return (

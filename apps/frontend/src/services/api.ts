@@ -175,6 +175,8 @@ export const api = {
     register: (data: RegisterRequest): Promise<UserResponse> =>
       apiClient.post('/auth/register', data),
 
+    logout: (): Promise<string> => apiClient.post('/auth/logout'),
+
     forgotPassword: (data: ForgotPasswordRequest): Promise<void> =>
       apiClient.post('/auth/forgot-password', data),
 

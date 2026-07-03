@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.entity.IssueReport;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.IssueReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

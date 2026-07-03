@@ -5,10 +5,11 @@ import java.util.List;
 
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.exception.ErrorCode;
-import com.example.demo.security.CustomUserDetails;
-import com.example.demo.security.CustomUserDetailsService;
+import com.example.demo.security.normal.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.MDC;
 import org.springframework.context.MessageSource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -75,28 +76,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
                 List<String> roles = jwtTokenProvider.getRolesFromToken(jwt);
 
-                // STRATEGY 1: Nếu userId có trong token, build CustomUserDetails từ token claims
-                // (Dùng cho traditional login, optimize performance)
+                // ĐƯA USER VÀO MDC NGAY KHI XÁC ĐỊNH ĐƯỢC USERNAME
+                MDC.put("user", username);
+
+                // STRATEGY 1: Nếu userId có trong token
                 if (userId != null) {
                     CustomUserDetails userDetails = buildCustomUserDetailsFromToken(username, userId, roles);
-
-                    List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
-
-                    UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-
+                    List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
                     log.debug("Set Spring Security Authenticated user from token: {} (ID: {})", username, userId);
 
                     filterChain.doFilter(request, response);
                     return;
                 }
 
-                // STRATEGY 2: Nếu không có userId trong token (OAuth2 login), query DB
-                // (Dùng cho OAuth2, ensure data consistency)
+                // STRATEGY 2: Nếu không có userId trong token (OAuth2 login)
                 log.debug("userId not found in token, querying database for user: {}", username);
                 UserDetails userDetailsFromDb = customUserDetailsService.loadUserByUsername(username);
 
@@ -106,15 +103,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
-
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
-
+                List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
                 log.debug("Set Spring Security Authenticated user from database: {} (ID: {})", username, customUserDetails.getId());
             }
 
@@ -126,6 +119,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 
     /**
      * Build CustomUserDetails từ token claims mà không cần query DB

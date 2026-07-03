@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.invoice.response.InvoiceResponse;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

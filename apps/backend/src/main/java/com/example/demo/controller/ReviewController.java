@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.product.review.ReviewDTO;
-import com.example.demo.security.CustomUserDetails;
+import com.example.demo.security.normal.CustomUserDetails;
 import com.example.demo.service.review.ReviewService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -37,5 +37,6 @@ public class ReviewController extends BaseController {
         @NotNull Long productId,
         @NotNull @Min(1) @Max(5) Integer rating,
         String comment
-    ) {}
+    ) {
+    }
 }

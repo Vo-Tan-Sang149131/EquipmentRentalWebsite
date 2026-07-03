@@ -1,7 +1,8 @@
 package com.example.demo.config.web;
 
-import com.example.demo.security.CustomOAuth2UserService;
-import com.example.demo.security.OAuth2AuthenticationSuccessHandler;
+import com.example.demo.security.oauth2.CustomOAuth2UserService;
+import com.example.demo.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.example.demo.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +35,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationSuccessHandler successHandler;
+    private final OAuth2AuthenticationFailureHandler failureHandler;
 
     private static final String[] PUBLIC_MATCHERS = {
         "/api/auth/**",
@@ -86,7 +88,8 @@ public class SecurityConfig {
 
             .oauth2Login(oauth2 -> oauth2
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .successHandler(successHandler)
+                .failureHandler(failureHandler)
             )
 
 

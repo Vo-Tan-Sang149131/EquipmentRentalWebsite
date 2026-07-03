@@ -1,5 +1,6 @@
-package com.example.demo.service;
+package com.example.demo.service.auth;
 
+import com.example.demo.common.annotation.RateLimit;
 import com.example.demo.dto.auth.request.ForgotPasswordReq;
 import com.example.demo.dto.auth.request.ResetPasswordReq;
 import com.example.demo.dto.auth.response.JwtResponse;
@@ -11,6 +12,8 @@ import com.example.demo.exception.ErrorCode;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.security.jwt.JwtTokenProvider;
 import com.example.demo.security.UserTokenInfo;
+import com.example.demo.service.EmailService;
+import com.example.demo.service.TokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -20,6 +23,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,13 +31,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +55,9 @@ public class AuthService {
     // Use this for dealing with redis, e.g., store refresh tokens, blacklisted tokens, etc.
     private final StringRedisTemplate redisTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
+    @RateLimit(limit = 5, duration = 300)
     public JwtResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         try {
             // 1. Verify User Credentials with username and password
@@ -101,6 +108,11 @@ public class AuthService {
             cookie.setMaxAge((int) (ttl / 1000));
             response.addCookie(cookie);
 
+            // Store username to MDC for logging purpose
+            MDC.put("user", user.getUsername());
+
+            log.info("Login Successfully");
+
             // 6. Build and return JWT response
             return JwtResponse.builder()
                 .token(token)
@@ -110,6 +122,7 @@ public class AuthService {
                 .roles(roles)
                 .build();
         } catch (AuthenticationException e) {
+            log.error("Authentication failed: {}", e.getMessage());
             throw new AppException(ErrorCode.UNAUTHORIZED);
         } catch (JsonProcessingException e) {
             log.error("Failed to convert UserTokenInfo to JSON: {}", e.getMessage());
@@ -126,6 +139,16 @@ public class AuthService {
         // 2. Retrieve token from the header
         String token = authorizationHeader.substring(7);
 
+        // Extra: extract the username from a token and store it to MDC for logging purpose
+        try {
+            if (tokenProvider.validateToken(token)) {
+                String username = tokenProvider.getUsernameFromToken(token);
+                MDC.put("user", username);
+            }
+        } catch (Exception e) {
+            log.warn("Cannot extract username from token for MDC logging: {}", e.getMessage());
+        }
+
         try {
             Date expirationDate = tokenProvider.getExpirationDateFromToken(token);
             long expiryTime = expirationDate.getTime(); //
@@ -139,23 +162,10 @@ public class AuthService {
                     TimeUnit.MILLISECONDS);
             }
 
-            // 3. Delete key from redis according to the value get from Cookie
-            if (StringUtils.hasText(redisKeyFromCookie)) {
-                redisTemplate.delete(redisKeyFromCookie);
-                log.info("Refresh token has been released from Redis.");
-            }
 
-            // 4. Delete Cookie from a client:
-            Cookie cookie = new Cookie("refresh_token", null); // Set to null to delete the cookie
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(0); // Set the cookie's expiration date to 0 to delete it'
-            response.addCookie(cookie);
-
-            // the jjwt exception class:
         } catch (ExpiredJwtException e) {
             // Token expired or invalid
-            throw new AppException(ErrorCode.UNAUTHORIZED);
+            log.warn("Token has expired or is invalid: {}", e.getMessage());
         } catch (MalformedJwtException e) {
             // Invalid token format cannot be parsed
             throw new AppException(ErrorCode.INVALID_KEY);
@@ -163,6 +173,27 @@ public class AuthService {
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
         }
 
+        // Even accessToken of user is invalid or expired, we always can remove Session/Cookie that user from Redis
+        try {
+            // 3. Delete key from redis according to the value get from Cookie
+            if (StringUtils.hasText(redisKeyFromCookie)) {
+                redisTemplate.delete(redisKeyFromCookie);
+                log.info("Refresh token has been released from Redis.");
+            }
+
+            // 4. Delete Cookie from a client:
+            Cookie cookie = new Cookie("refresh_token", null);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
+
+            log.info("Logout Successfully");
+
+        } catch (Exception e) {
+            log.error("Error clearing session or cookies", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
     }
 
     public TokenRefreshResponse refreshToken(String redisKeyFromCookie, HttpServletResponse response) {
@@ -210,6 +241,8 @@ public class AuthService {
             cookie.setMaxAge((int) (ttl / 1000));
             response.addCookie(cookie);
 
+            log.info("Refresh token has been updated in Redis.");
+
             // 7. Return the new Access Token and Refresh Token to the client
             return TokenRefreshResponse.builder()
                 .accessToken(newAccessToken)
@@ -221,66 +254,46 @@ public class AuthService {
         }
     }
 
+    @RateLimit(limit = 3, duration = 300)
     public void forgotPassword(ForgotPasswordReq request) {
 
-        // 1. Retrieve user's email from the request'
-        String email = request.getEmail();
+        // Store user email to MDC for logging purpose
+        MDC.put("user", request.getEmail());
 
-        // 2. Check if the user exists in the database and create a reset token
-        Optional<User> userOptional = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(request.getEmail())
+            .orElseGet(() -> {
+                log.warn("Email not found: {}", request.getEmail());
+                return null;
+            });
 
-        /*
-         * if user not found we log and return not throw any exceptionn
-         * to avoid user enumeration and phishing attack.
-         */
-        if (userOptional.isEmpty()) {
-            log.warn("User with email {} not found", email);
-            return;
+        if (user != null) {
+            // Delegate to tokenService to generate and send the reset token
+            String token = tokenService.createResetToken(user.getEmail());
+            String resetLink = "http://localhost:5173/reset-password?token=" + token;
+            emailService.sendResetPasswordEmail(user.getEmail(), resetLink);
         }
 
-        User user = userOptional.get();
-        String resetToken = UUID.randomUUID().toString();
-
-        // 3. Store the reset token in Redis with an expiration time (e.g., 15 minutes)
-        String redisKey = "reset_token:" + resetToken;
-        redisTemplate.opsForValue().set(redisKey, user.getEmail(), 15, TimeUnit.MINUTES);
-
-        // Create a reset link (you should replace the URL with your frontend's reset password page)
-        String resetLink = "http://localhost:5173/reset-password?token=" + resetToken;
-        ;
-
-        // Send the reset link to the user's email
-        emailService.sendResetPasswordEmail(email, resetLink);
-        log.info("Reset link be sent to user's email: {}", email);
+        log.info("Reset password email sent to: {}", request.getEmail());
     }
 
+
+    @Transactional
     public void resetPassword(ResetPasswordReq request) {
-        String token = request.getToken();
+        String email = tokenService.validateToken(request.getToken());
 
-        String redisKey = "reset_token:" + token;
-
-        // 1. Search token in redis and retrieve the associated email
-        String email = redisTemplate.opsForValue().get(redisKey);
-
-        if (email == null) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-
-        // 2. Extract the User that has that email from the database
         User user = userRepository.findByEmail(email).orElseThrow(
             () -> new AppException(ErrorCode.USER_NOT_FOUND)
         );
 
-        // 3. Encrypt the user password and update the old password with the new one
-        String encryptPassword = passwordEncoder.encode(request.getNewPassword());
-        user.setPassword(encryptPassword);
+        // Store username of the user to MDC for logging purpose
+        MDC.put("user", user.getUsername());
 
-        // 4. Save the updated user to the database
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        // 5. Delete the reset token from redis to avoid reuse
-        redisTemplate.delete(redisKey);
-        log.info("Password has been reset for user: {}", user.getEmail());
+        tokenService.deleteToken(request.getToken());
+
+        log.info("Password reset successfully for user: {}", user.getUsername());
     }
-    
+
 }

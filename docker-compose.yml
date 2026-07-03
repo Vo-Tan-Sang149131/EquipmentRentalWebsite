@@ -50,30 +50,27 @@ services:
       dockerfile: ./apps/backend/Dockerfile
     container_name: equipment-rental-backend
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 768M
+    volumes:
+      - ./apps/backend/logs:/app/logs
     env_file:
       - ./apps/backend/.env
     environment:
-      JAVA_OPTS: '-Xmx512m -Xms256m -Ddebug=true'
+      JAVA_OPTS: '-Xmx512m -Xms256m'
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME}
+      DB_NAME: ${DB_NAME:-equipment_rental_db}
       DB_USER: equipment_rental_user
-      DB_PASSWORD: ${DB_USER_PASSWORD}
+      DB_PASSWORD: ${DB_USER_PASSWORD:-password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-
       SERVER_PORT: 8080
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: "DEBUG"
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: "DEBUG"
       APP_FLYWAY_AUTO_REPAIR: false
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID: "${FACEBOOK_CLIENT_ID}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET: "${FACEBOOK_CLIENT_SECRET}"
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID:-}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET:-}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI:-http://localhost:5173/oauth2/redirect}
+      LOG_DIR: ${LOG_DIR:-/app/logs}
     ports:
       - '8080:8080'
     depends_on:

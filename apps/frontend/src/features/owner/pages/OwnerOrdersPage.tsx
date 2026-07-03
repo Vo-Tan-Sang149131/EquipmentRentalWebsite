@@ -34,16 +34,20 @@ export default function OwnerOrdersPage() {
       const res: SpringPageResponse<Order> = await deviceService.getOwnerOrders(p - 1, 10);
       setOrders(res.content || []);
       setTotalPages(res.totalPages);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setError(err?.message || 'Không thể tải danh sách đơn hàng.');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Không thể tải danh sách đơn hàng.');
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchPage(page);
+    void fetchPage(page);
   }, [page, fetchPage]);
 
   useEffect(() => {
@@ -60,10 +64,20 @@ export default function OwnerOrdersPage() {
     setActionLoading(prev => ({ ...prev, [orderId]: true }));
     try {
       const response = await deviceService.confirmOrder(orderId);
-      setOrders(orders.map(o => o.orderId === orderId ? response : o));
-    } catch (err: any) {
+
+      // FIX: If response contains a wrapped .result object, safely unwrap it
+      const updatedOrder = (response && 'result' in (response as any))
+        ? (response as any).result
+        : response;
+
+      setOrders(orders.map(o => o.orderId === orderId ? updatedOrder : o));
+    } catch (err) {
       console.error(err);
-      alert(err?.message || 'Không thể xác nhận đơn hàng.');
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Không thể xác nhận đơn hàng.');
+      }
     } finally {
       setActionLoading(prev => ({ ...prev, [orderId]: false }));
     }
@@ -75,10 +89,20 @@ export default function OwnerOrdersPage() {
     setActionLoading(prev => ({ ...prev, [orderId]: true }));
     try {
       const response = await deviceService.rejectOrder(orderId);
-      setOrders(orders.map(o => o.orderId === orderId ? response : o));
-    } catch (err: any) {
+
+      // FIX: If response contains a wrapped .result object, safely unwrap it
+      const updatedOrder = (response && 'result' in (response as any))
+        ? (response as any).result
+        : response;
+
+      setOrders(orders.map(o => o.orderId === orderId ? updatedOrder : o));
+    } catch (err) {
       console.error(err);
-      alert(err?.message || 'Không thể từ chối đơn hàng.');
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Không thể từ chối đơn hàng.');
+      }
     } finally {
       setActionLoading(prev => ({ ...prev, [orderId]: false }));
     }
@@ -94,9 +118,13 @@ export default function OwnerOrdersPage() {
       setIsReportModalOpen(false);
       setReportTitle('');
       setReportDescription('');
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(err?.message || 'Không thể gửi báo cáo.');
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Không thể gửi báo cáo.');
+      }
     }
   };
 
@@ -315,5 +343,3 @@ export default function OwnerOrdersPage() {
     </div>
   );
 }
-
-

@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.security.normal;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;

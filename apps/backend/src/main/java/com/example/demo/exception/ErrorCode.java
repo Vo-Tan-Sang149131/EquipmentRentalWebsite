@@ -9,7 +9,7 @@ public enum ErrorCode {
     // ==== Common / System ====
     INVALID_KEY(9999, "error.invalid.key", HttpStatus.BAD_REQUEST),
     UNCATEGORIZED_EXCEPTION(9998, "error.uncategorized", HttpStatus.INTERNAL_SERVER_ERROR),
-    SERVICE_UNAVAILABLE(1009, "error.service_unavailable", HttpStatus.SERVICE_UNAVAILABLE),
+    SERVICE_UNAVAILABLE(1019, "error.service_unavailable", HttpStatus.SERVICE_UNAVAILABLE),
 
     // ==== Auth / User ====
     DEFAULT_ROLE_NOT_FOUND(1001, "error.default_role.not_found", HttpStatus.NOT_FOUND),
@@ -22,6 +22,7 @@ public enum ErrorCode {
     FORBIDDEN(1008, "error.forbidden", HttpStatus.FORBIDDEN),
     VALIDATION_ERROR(1009, "error.validation", HttpStatus.BAD_REQUEST),
     UNPROCESSABLE(1010, "error.unprocessable", HttpStatus.UNPROCESSABLE_CONTENT),
+    TOKEN_INVALID_OR_EXPIRED(1012, "error.token.invalid_or_expired", HttpStatus.UNAUTHORIZED),
 
     EMAIL_ALREADY_EXISTS(1101, "error.email.already_exists", HttpStatus.CONFLICT),
     PHONE_ALREADY_EXISTS(1102, "error.phone.already_exists", HttpStatus.CONFLICT),
@@ -66,7 +67,10 @@ public enum ErrorCode {
     CHAT_ROOM_ALREADY_EXISTS(1801, "error.chat_room.already_exists", HttpStatus.CONFLICT),
     CHAT_ROOM_NOT_FOUND(1802, "error.chat_room.not_found", HttpStatus.NOT_FOUND),
     CHAT_MESSAGE_NOT_FOUND(1803, "error.chat_message.not_found", HttpStatus.NOT_FOUND),
-    CHAT_UNAUTHORIZED(1804, "error.chat.unauthorized", HttpStatus.FORBIDDEN);
+    CHAT_UNAUTHORIZED(1804, "error.chat.unauthorized", HttpStatus.FORBIDDEN),
+
+    // ==== Rate Limit ====
+    TOO_MANY_REQUESTS(1901, "error.too_many_requests", HttpStatus.TOO_MANY_REQUESTS);
 
     private final int code;            // Internal code
     private final String keyMessage;   // Key for multi-language

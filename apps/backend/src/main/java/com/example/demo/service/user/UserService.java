@@ -1,5 +1,6 @@
 package com.example.demo.service.user;
 
+import com.example.demo.common.annotation.RateLimit;
 import com.example.demo.dto.auth.request.RegisterRequest;
 import com.example.demo.dto.user.request.BasicProfileRequest;
 import com.example.demo.dto.user.request.ChangePasswordRequest;
@@ -20,6 +21,7 @@ import com.example.demo.repository.user.RoleRepository;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +46,7 @@ public class UserService {
     private final OrderRepository orderRepository;
 
 
+    @RateLimit(limit = 5, duration = 300)
     @Transactional
     public UserResponse registerUser(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -55,6 +58,8 @@ public class UserService {
         if (request.getPhoneNumber() != null && userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new AppException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
+
+        MDC.put("username", request.getUsername());
 
         Role defaultRole = roleRepository.findByRole(RoleType.RENTER)
             .orElseThrow(() -> new AppException(ErrorCode.DEFAULT_ROLE_NOT_FOUND));

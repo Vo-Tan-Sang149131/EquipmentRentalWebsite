@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { deviceService } from '../services/deviceService';
+import type { DeviceManage } from '../types/device.types';
 
 export default function OwnerCalendarPage() {
-  const [devices, setDevices] = useState<{ id: number; productName: string; serialNumber: string }[]>([]);
+  const [devices, setDevices] = useState<DeviceManage[]>([]);
   const [deviceId, setDeviceId] = useState<number | null>(null);
   const [blockedDates, setBlockedDates] = useState<string[]>([]);
   const [start, setStart] = useState('');
@@ -17,18 +18,23 @@ export default function OwnerCalendarPage() {
       setLoading(true);
       try {
         const data = await deviceService.getMyInventory();
-        setDevices(data || []);
-        if (data && data.length > 0) {
-          setDeviceId(data[0].id);
+        const content = data?.content || [];
+        setDevices(content);
+
+        // FIX: Check if content array has items and grab id from the first item
+        if (content.length > 0) {
+          setDeviceId(content[0].id);
         }
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
         setError('Failed to load devices');
       } finally {
         setLoading(false);
       }
     };
-    loadDevices();
+
+    // FIX: Safe floating promise execution
+    void loadDevices();
   }, []);
 
   // Load blocked dates when device changes
@@ -39,12 +45,14 @@ export default function OwnerCalendarPage() {
         const data = await deviceService.getBlockedDates(deviceId);
         setBlockedDates(data || []);
         setError(null);
-      } catch (err: any) {
+      } catch (err) {
         console.error(err);
         setError('Failed to load calendar');
       }
     };
-    loadCalendar();
+
+    // FIX: Safe floating promise execution
+    void loadCalendar();
   }, [deviceId]);
 
   const handleBlock = async () => {
@@ -70,9 +78,13 @@ export default function OwnerCalendarPage() {
       // Reload calendar
       const data = await deviceService.getBlockedDates(deviceId);
       setBlockedDates(data || []);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(err?.message || 'Failed to block dates');
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Failed to block dates');
+      }
     } finally {
       setActionLoading(false);
     }
@@ -94,9 +106,13 @@ export default function OwnerCalendarPage() {
       // Reload calendar
       const data = await deviceService.getBlockedDates(deviceId);
       setBlockedDates(data || []);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      alert(err?.message || 'Failed to unblock dates');
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        alert('Failed to unblock dates');
+      }
     } finally {
       setActionLoading(false);
     }
@@ -200,5 +216,3 @@ export default function OwnerCalendarPage() {
     </main>
   );
 }
-
-

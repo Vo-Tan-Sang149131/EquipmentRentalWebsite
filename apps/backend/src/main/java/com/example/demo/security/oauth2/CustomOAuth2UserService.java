@@ -1,4 +1,4 @@
-package com.example.demo.security;
+package com.example.demo.security.oauth2;
 
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
@@ -9,6 +9,7 @@ import com.example.demo.exception.ErrorCode;
 import com.example.demo.repository.user.RoleRepository;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.repository.user.UserSocialAccountRepository;
+import com.example.demo.security.normal.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -38,9 +39,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = defaultUserService.loadUser(userRequest);
-        log.info("OAuth2 provider = {}", userRequest.getClientRegistration().getRegistrationId());
-        String currentEmail = oAuth2User.getAttribute("email");
-        log.info("OAuth2 email = {}", currentEmail);
+//        log.info("OAuth2 provider = {}", userRequest.getClientRegistration().getRegistrationId());
+//        String currentEmail = oAuth2User.getAttribute("email");
+//        log.info("OAuth2 email = {}", currentEmail);
 
         String provider = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
         String providerUserId = null;

@@ -4,14 +4,12 @@ import com.example.demo.controller.BaseController;
 import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.order.response.OrderSummaryResponse;
 import com.example.demo.dto.user.response.UserResponse;
-import com.example.demo.security.CustomUserDetails;
 import com.example.demo.service.order.OrderService;
 import com.example.demo.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

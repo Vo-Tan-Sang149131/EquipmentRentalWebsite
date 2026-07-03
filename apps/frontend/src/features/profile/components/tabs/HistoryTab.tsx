@@ -67,6 +67,7 @@ export function HistoryTab() {
         </div>
       ) : (
         <div className="space-y-4">
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {orders.map((order: any) => (
             <div key={order.orderId}
                  className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all p-5">

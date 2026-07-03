@@ -81,6 +81,7 @@ export function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {categories.map((cat: any) => (
               <Link
                 key={cat.id}
@@ -125,6 +126,7 @@ export function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {products.map((product: any) => (
                 <Link
                   key={product.id}

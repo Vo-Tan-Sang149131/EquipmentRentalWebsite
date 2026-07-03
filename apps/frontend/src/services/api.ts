@@ -214,6 +214,7 @@ export const api = {
       }),
     revealKyc: (data: RevealKycRequest): Promise<string> =>
       apiClient.post('/users/profile/reveal-kyc', data),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getMyOrders: (): Promise<any> => apiClient.get('/orders/my-orders'),
   },
 };

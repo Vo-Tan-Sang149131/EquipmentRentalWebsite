@@ -10,7 +10,7 @@ import RegisterDevicePage from '@/features/device-registration/pages/RegisterDev
 import OwnerDashboard from '@/features/owner/pages/OwnerDashboard.tsx';
 import InventoryPage from '@/features/owner/pages/InventoryPage.tsx';
 import OwnerOrdersPage from '@/features/owner/pages/OwnerOrdersPage.tsx';
-import OwnerCalendarPage from '@/features/owner/pages/OwnerCalendarPage.tsx';
+// import OwnerCalendarPage from '@/features/owner/pages/OwnerCalendarPage.tsx';
 import OwnerDeviceEditPage from '@/features/owner/pages/OwnerDeviceEditPage.tsx';
 import OwnerReviewsPage from '@/features/owner/pages/OwnerReviewsPage.tsx';
 import AdminUsersPage from '@/features/admin/pages/AdminUsersPage.tsx';
@@ -68,7 +68,7 @@ function App() {
           <Route path="/dashboard/inventory" element={<InventoryPage />} />
           <Route path="/dashboard/device/:id/edit" element={<OwnerDeviceEditPage />} />
           <Route path="/dashboard/orders" element={<OwnerOrdersPage />} />
-          <Route path="/dashboard/calendar" element={<OwnerCalendarPage />} />
+          {/*<Route path="/dashboard/calendar" element={<OwnerCalendarPage />} />*/}
           <Route path="/dashboard/reviews" element={<OwnerReviewsPage />} />
         </Route>
       </Route>

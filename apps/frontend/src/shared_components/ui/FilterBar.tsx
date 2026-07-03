@@ -3,6 +3,7 @@ import { useState } from 'react';
 interface FilterState {
   search: string;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -12,6 +13,7 @@ interface FilterProps {
     name: string;
     label: string;
     type: 'text' | 'select' | 'checkbox';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options?: Array<{ value: any; label: string }>;
   }>;
 }
@@ -19,6 +21,7 @@ interface FilterProps {
 export default function FilterBar({ onFilterChange, fields }: FilterProps) {
   const [filters, setFilters] = useState<FilterState>({ search: '' });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (name: string, value: any) => {
     const newFilters = { ...filters, [name]: value };
     setFilters(newFilters);

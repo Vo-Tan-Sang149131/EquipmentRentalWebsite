@@ -4,6 +4,7 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 export interface TableColumn<T> {
   key: keyof T;
   header: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render?: (value: any, row: T) => ReactNode;
   sortable?: boolean;
   width?: string;

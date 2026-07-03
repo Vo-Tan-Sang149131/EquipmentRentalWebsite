@@ -183,6 +183,9 @@ export const api = {
     resetPassword: (data: ResetPasswordRequest): Promise<void> =>
       apiClient.post('/auth/reset-password', data),
 
+    validateToken: (token: string): Promise<boolean> =>
+      apiClient.post('/auth/validate-token', { token }),
+
     checkDuplicateEmail: (email: string): Promise<boolean> =>
       apiClient.get('/auth/check-email', { params: { email } }),
 

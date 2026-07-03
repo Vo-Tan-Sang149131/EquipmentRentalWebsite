@@ -4,6 +4,8 @@ import com.example.demo.dto.MyApiResponse;
 import com.example.demo.dto.auth.request.*;
 import com.example.demo.dto.auth.response.TokenRefreshResponse;
 import com.example.demo.dto.user.response.UserResponse;
+import com.example.demo.exception.AppException;
+import com.example.demo.service.TokenService;
 import com.example.demo.service.auth.AuthService;
 import com.example.demo.service.user.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -35,6 +39,7 @@ public class AuthController extends BaseController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final TokenService tokenService;
     private final MessageSource messageSource;
 
     @PostMapping("/login")
@@ -115,6 +120,19 @@ public class AuthController extends BaseController {
     public ResponseEntity<MyApiResponse<String>> resetPassword(@Valid @RequestBody ResetPasswordReq request) {
         authService.resetPassword(request);
         return createResponse(HttpStatus.OK, 1000, "Password reset successfully", "Your password has been reset successfully. You can now log in with your new password.");
+    }
+
+    @PostMapping("/validate-token")
+    @Operation(summary = "Validate reset token", description = "Check if reset token is still valid")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirements
+    public ResponseEntity<MyApiResponse<Boolean>> validateToken(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        try {
+            tokenService.validateToken(token);
+            return createResponse(HttpStatus.OK, true);
+        } catch (AppException e) {
+            return createResponse(HttpStatus.BAD_REQUEST, false);
+        }
     }
 
 

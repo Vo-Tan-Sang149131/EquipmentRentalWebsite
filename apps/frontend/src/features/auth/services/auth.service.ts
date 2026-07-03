@@ -151,6 +151,21 @@ export const useResetPasswordMutation = () => {
   });
 };
 
+export const useValidateTokenQuery = (token: string) => {
+  return useQuery({
+    queryKey: ['validateToken', token],
+    queryFn: () => api.auth.validateToken(token),
+    enabled: !!token,
+  });
+};
+
+export const useValidateTokenMutation = () => {
+  return useMutation({
+    mutationFn: (token: string) => api.auth.validateToken(token),
+  });
+};
+
+
 export const useCheckDuplicateEmail = (email: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['checkEmail', email],

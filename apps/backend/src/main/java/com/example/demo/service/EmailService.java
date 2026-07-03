@@ -40,4 +40,30 @@ public class EmailService {
             log.error("Failed to create MIME message: {}", e.getMessage());
         }
     }
+
+    @Async
+    public void sendSuccessEmail(String destMail) {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(destMail);
+            helper.setSubject("Mật khẩu đã được thay đổi thành công");
+
+            String htmlContent = "<h3>Xin chào,</h3>"
+                + "<p>Mật khẩu của bạn đã được thay đổi thành công.</p>"
+                + "<p>Nếu bạn không thực hiện hành động này, vui lòng liên hệ ngay với bộ phận hỗ trợ để đảm bảo an toàn cho tài khoản.</p>"
+                + "<p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>";
+
+            helper.setText(htmlContent, true);
+            mailSender.send(message);
+
+            log.info("Success email sent to: {}", destMail);
+
+        } catch (MessagingException e) {
+            log.error("Failed to send success email: {}", e.getMessage());
+        }
+    }
+
 }

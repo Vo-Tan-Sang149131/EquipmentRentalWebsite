@@ -292,6 +292,7 @@ public class AuthService {
         userRepository.save(user);
 
         tokenService.deleteToken(request.getToken());
+        emailService.sendSuccessEmail(email);
 
         log.info("Password reset successfully for user: {}", user.getUsername());
     }

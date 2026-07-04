@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,6 +57,9 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+
+    @Value("${app.redirect-uri}")
+    private String redirectUri;
 
     @RateLimit(limit = 5, duration = 300)
     public JwtResponse login(LoginRequest loginRequest, HttpServletResponse response) {
@@ -269,7 +273,7 @@ public class AuthService {
         if (user != null) {
             // Delegate to tokenService to generate and send the reset token
             String token = tokenService.createResetToken(user.getEmail());
-            String resetLink = "http://localhost:5173/reset-password?token=" + token;
+            String resetLink = String.format("%s/reset-password?token=%s", redirectUri, token);
             emailService.sendResetPasswordEmail(user.getEmail(), resetLink);
         }
 

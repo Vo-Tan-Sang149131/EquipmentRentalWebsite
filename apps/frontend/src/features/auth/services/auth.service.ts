@@ -59,7 +59,14 @@ export const useLoginMutation = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
+      const appCode = error.response?.data?.appCode;
       const errorMsg = error.response?.data?.message || 'Login failed. Please try again.';
+
+      if (appCode === 2001) {
+        toast.error('Bạn đã vượt quá số lần thử. Vui lòng xác minh CAPTCHA.');
+        return;
+      }
+
       toast.error(errorMsg);
     },
   });

@@ -51,6 +51,7 @@
     "cosmiconfig": "9.0.1"
   },
   "devDependencies": {
+    "@types/react-google-recaptcha": "^2.1.9",
     "minimatch": "^5.1.9",
     "rimraf": "^6.1.3"
   }

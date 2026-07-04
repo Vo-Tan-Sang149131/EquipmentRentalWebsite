@@ -145,7 +145,6 @@
     </dependency>
 
     <!-- Source: https://mvnrepository.com/artifact/com.github.codemonstur/embedded-redis -->
-    <!-- Used for testing Redis interactions without needing an actual Redis server -->
     <dependency>
       <groupId>com.github.codemonstur</groupId>
       <artifactId>embedded-redis</artifactId>
@@ -177,12 +176,12 @@
       <artifactId>spring-boot-starter-oauth2-client</artifactId>
     </dependency>
 
-    <!-- Starter và Core -->
+    <!-- Starter and Core -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-flyway</artifactId>
     </dependency>
-    <!-- Extension dành riêng cho MySQL -->
+    <!-- Extension for MySQL -->
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-mysql</artifactId>

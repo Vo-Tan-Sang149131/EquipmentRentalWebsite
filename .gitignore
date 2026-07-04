@@ -45,3 +45,6 @@ docker-compose.override.yml
 .nx/workspace-data/
 .nx/cache/
 .nx/
+
+# Local testing:
+**/tools/

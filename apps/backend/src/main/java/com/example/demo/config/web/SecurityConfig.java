@@ -26,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -109,8 +110,9 @@ public class SecurityConfig {
         // Allow all common HTTP methods
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
-        // Allow all headers
-        configuration.setAllowedHeaders(List.of("*"));
+        // Allow for specific headers: Authorization, Cache-Control, Content-Type, X-Captcha-Token
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-Captcha-Token"));
+
 
         // Allow credentials (cookies, authorization headers, etc.)
         configuration.setAllowCredentials(true);

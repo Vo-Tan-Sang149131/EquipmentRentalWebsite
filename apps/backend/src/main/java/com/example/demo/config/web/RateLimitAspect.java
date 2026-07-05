@@ -84,7 +84,7 @@ public class RateLimitAspect {
 
                 // Gửi token lên Google kiểm tra xem ông này đã giải CAPTCHA chưa
                 if (!captchaService.verifyToken(captchaToken)) {
-                    log.warn("IP {} vi phạm mức độ nặng tại API {}. Yêu cầu giải CAPTCHA.", ip, methodName);
+                    log.error("[SECURITY-ALERT] IP {} gửi mã CAPTCHA giả mạo/hết hạn lên API {}!", ip, methodName);
                     // Ném lỗi bắt buộc giải mã CAPTCHA (Frontend sẽ bắt mã này để hiện ô tích reCAPTCHA)
                     throw new AppException(ErrorCode.NEED_CAPTCHA, "Vui lòng hoàn thành CAPTCHA để tiếp tục.");
                 }

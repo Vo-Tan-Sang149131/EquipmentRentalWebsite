@@ -13,7 +13,7 @@
     "// Docker Shortcuts": "-------------------------------------------------",
     "docker:dev": "docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d --build",
     "docker:prod": "docker-compose -f docker-compose.yml up -d --build",
-    "docker:down": "docker-compose down",
+    "docker:down": "docker-compose down -v",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:ci": "npm run test:ci --workspaces --if-present",

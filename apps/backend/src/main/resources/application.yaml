@@ -40,9 +40,9 @@ spring:
     password: ${DB_PASSWORD:root}
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
+      password: ${REDIS_PASSWORD:devpassword}
 
   h2:
     console:

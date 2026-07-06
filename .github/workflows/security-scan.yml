@@ -1,0 +1,24 @@
+name: Security Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Automatically run at midnight UTC
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  repo-scan:
+    name: Scan Code & Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Security Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'

@@ -1,86 +1,91 @@
 <configuration debug="true">
   <property name="LOG_DIR" value="${LOG_DIR:-/app/logs}"/>
 
+  <!-- Định nghĩa một Pattern chung có khả năng che giấu (Masking) thông tin nhạy cảm -->
+  <!-- Regex này tìm từ khóa password hoặc passwd (không phân biệt hoa thường) và che giá trị phía sau bằng **** -->
+  <property name="MASKED_PATTERN"
+            value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %logger{36} - %replace(%msg){'(?i)(password|passwd|secret|tokenValue|creditCard)=\s*([^,\s&amp;]+)', '$1=******'}%n"/>
+
   <!-- ==================== 1. APPENDER IN CONSOLE ==================== -->
   <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %logger{36} - %msg%n</pattern>
+      <!-- Sửa từ %pattern cũ sang MASKED_PATTERN mới khai báo ở trên -->
+      <pattern>${MASKED_PATTERN}</pattern>
     </encoder>
   </appender>
 
-  <!-- ==================== 2. APPENDER GOM LỖI CHUYÊN BIỆT (MỚI) ==================== -->
-  <!-- Chỉ giữ lại log WARN và ERROR của TOÀN BỘ hệ thống -->
+  <!-- ==================== 2. APPENDER ERROR ==================== -->
   <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/error.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
-    <!-- Bộ lọc: Chỉ cho phép level WARN trở lên đi vào file này -->
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>WARN</level>
     </filter>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %logger{36} - %msg%n</pattern>
+      <pattern>${MASKED_PATTERN}</pattern>
     </encoder>
   </appender>
 
-  <!-- ==================== 3. APPENDER LOG CHUNG ỨNG DỤNG ==================== -->
+  <!-- ==================== 3. APPENDER APP LOG ==================== -->
   <appender name="AppFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/app.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %logger{36} - %msg%n</pattern>
+      <pattern>${MASKED_PATTERN}</pattern>
     </encoder>
   </appender>
 
-  <!-- ==================== 4. APPENDER AUTH (TRADITIONAL) ==================== -->
+  <!-- ==================== 4. APPENDER AUTH LOG ==================== -->
   <appender name="AuthFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/auth.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_DIR}/auth.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${LOG_DIR}/auth.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
+    <!-- Vì auth.log không in tên class %logger, ta viết replace trực tiếp ở đây -->
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] -
+        %replace(%msg){'(?i)(password|passwd|secret)=\s*([^,\s&amp;]+)', '$1=******'}%n
+      </pattern>
     </encoder>
   </appender>
 
-  <!-- ==================== 5. APPENDER OAUTH2 ==================== -->
+  <!-- ==================== 5. APPENDER OAUTH LOG ==================== -->
   <appender name="OAuthFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/oauth.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_DIR}/oauth.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${LOG_DIR}/oauth.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] -
+        %replace(%msg){'(?i)(password|passwd|secret)=\s*([^,\s&amp;]+)', '$1=******'}%n
+      </pattern>
     </encoder>
   </appender>
 
-  <!-- ==================== 6. PHÂN LUỒNG LOGGER GHI FILE ==================== -->
-
-  <!-- Luồng Auth: Đẩy vào Console, AuthFile và đồng thời đẩy cả lỗi vào ErrorFile -->
+  <!-- ==================== 6. LOGGER ROUTING ==================== -->
   <logger name="com.example.demo.service.auth" level="INFO" additivity="false">
     <appender-ref ref="Console"/>
     <appender-ref ref="AuthFile"/>
-    <appender-ref ref="ErrorFile"/> <!-- Bổ sung để gom lỗi auth nếu có -->
+    <appender-ref ref="ErrorFile"/>
   </logger>
 
-  <!-- Luồng OAuth2: Đẩy vào Console, OAuthFile và đồng thời đẩy cả lỗi vào ErrorFile -->
   <logger name="com.example.demo.security.oauth2" level="INFO" additivity="false">
     <appender-ref ref="Console"/>
     <appender-ref ref="OAuthFile"/>
-    <appender-ref ref="ErrorFile"/> <!-- Bổ sung để gom lỗi oauth2 nếu có -->
+    <appender-ref ref="ErrorFile"/>
   </logger>
 
-  <!-- Luồng Root mặc định toàn hệ thống -->
   <root level="INFO">
     <appender-ref ref="Console"/>
     <appender-ref ref="AppFile"/>
-    <appender-ref ref="ErrorFile"/> <!-- Gom lỗi cho toàn bộ các phần còn lại -->
+    <appender-ref ref="ErrorFile"/>
   </root>
 </configuration>

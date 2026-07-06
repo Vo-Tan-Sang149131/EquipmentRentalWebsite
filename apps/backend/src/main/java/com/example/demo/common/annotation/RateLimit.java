@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
-    int limit() default 5;      // Số lần tối đa
+    int limit() default 5;      // Maximal number of requests allowed within the duration
 
-    int duration() default 600; // Thời gian hiệu lực (giây) - mặc định 10 phút
+    int duration() default 600; // Active duration in seconds
+
+    long blockDuration() default 30; // Block duration time
 }

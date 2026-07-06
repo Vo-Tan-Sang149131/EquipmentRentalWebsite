@@ -5,10 +5,12 @@ import com.example.demo.utils.ValidationUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,13 +20,22 @@ import java.util.Map;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalExceptionHandler {
     private final MessageSource messageSource;
 
-    // Use for status code of business logic: E.g: 401, 403, 404, 500
+    // Use for status code of business logic: E.g: 401, 403, 404, 429, 500
     @ExceptionHandler(value = AppException.class)
     public ResponseEntity<MyApiResponse<Object>> handleAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
+
+        // --- CONTROL AND CATEGORY LOGGING ---
+        // If just SPAM API or CAPTCHA, log it as INFO level, otherwise log it as ERROR level
+        if (errorCode == ErrorCode.TOO_MANY_REQUESTS || errorCode == ErrorCode.NEED_CAPTCHA) {
+            log.info("Rate Limiter Triggered: {} - Message: {}", errorCode.name(), e.getMessage());
+        } else {
+            log.error("Nghiệp vụ ứng dụng gặp lỗi [{}]: {}", errorCode.name(), e.getMessage());
+        }
 
         MyApiResponse<Object> myApiResponse = MyApiResponse.builder()
             .statusCode(errorCode.getCode())
@@ -32,8 +43,6 @@ public class GlobalExceptionHandler {
                 null, LocaleContextHolder.getLocale()))
             .build();
 
-        // ResponseEntity include Header, Body, Status Code
-        // ApiResponse are in JSON format
         return ResponseEntity
             .status(errorCode.getStatusCode())
             .body(myApiResponse);
@@ -98,14 +107,33 @@ public class GlobalExceptionHandler {
             .body(myApiResponse);
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<MyApiResponse<Object>> handleGenericException(Exception e) {
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<MyApiResponse<Object>> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+
+        log.info("Method not allowed: {} | Supported methods: {}", e.getMessage(), e.getSupportedHttpMethods());
+
         MyApiResponse<Object> myApiResponse = MyApiResponse.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message("Hệ thống có lỗi xảy ra: " + e.getMessage())
+            .statusCode(HttpStatus.METHOD_NOT_ALLOWED.value())
+            .message("Phương thức HTTP không được hỗ trợ: " + e.getMethod())
             .build();
 
         return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR).body(myApiResponse);
+            .status(HttpStatus.METHOD_NOT_ALLOWED)
+            .body(myApiResponse);
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<MyApiResponse<Object>> handleGenericException(Exception e) {
+
+        log.error("Hệ thống gặp lỗi nghiêm trọng (Uncaught Exception): ", e);
+
+        MyApiResponse<Object> myApiResponse = MyApiResponse.builder()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .message("Hệ thống có lỗi xảy ra, vui lòng thử lại sau.")
+            .build();
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(myApiResponse);
     }
 }

@@ -59,7 +59,14 @@ export const useLoginMutation = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
+      const appCode = error.response?.data?.appCode;
       const errorMsg = error.response?.data?.message || 'Login failed. Please try again.';
+
+      if (appCode === 2001) {
+        toast.error('Bạn đã vượt quá số lần thử. Vui lòng xác minh CAPTCHA.');
+        return;
+      }
+
       toast.error(errorMsg);
     },
   });
@@ -150,6 +157,21 @@ export const useResetPasswordMutation = () => {
     },
   });
 };
+
+export const useValidateTokenQuery = (token: string) => {
+  return useQuery({
+    queryKey: ['validateToken', token],
+    queryFn: () => api.auth.validateToken(token),
+    enabled: !!token,
+  });
+};
+
+export const useValidateTokenMutation = () => {
+  return useMutation({
+    mutationFn: (token: string) => api.auth.validateToken(token),
+  });
+};
+
 
 export const useCheckDuplicateEmail = (email: string, options?: { enabled?: boolean }) => {
   return useQuery({

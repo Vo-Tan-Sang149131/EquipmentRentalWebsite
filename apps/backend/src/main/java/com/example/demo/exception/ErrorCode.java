@@ -70,7 +70,10 @@ public enum ErrorCode {
     CHAT_UNAUTHORIZED(1804, "error.chat.unauthorized", HttpStatus.FORBIDDEN),
 
     // ==== Rate Limit ====
-    TOO_MANY_REQUESTS(1901, "error.too_many_requests", HttpStatus.TOO_MANY_REQUESTS);
+    TOO_MANY_REQUESTS(1901, "error.too_many_requests", HttpStatus.TOO_MANY_REQUESTS),
+
+    NEED_CAPTCHA(2001, "error.need_captcha", HttpStatus.BAD_REQUEST),
+    INVALID_CAPTCHA(2002, "error.invalid_captcha", HttpStatus.BAD_REQUEST);
 
     private final int code;            // Internal code
     private final String keyMessage;   // Key for multi-language

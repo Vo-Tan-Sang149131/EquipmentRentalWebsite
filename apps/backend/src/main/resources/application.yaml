@@ -24,7 +24,9 @@ spring:
           auth: true
           starttls:
             enable: true
-
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -36,13 +38,11 @@ spring:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:equipment_rental_db}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:root}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
-      password: ${REDIS_PASSWORD:}
+      password: ${REDIS_PASSWORD:devpassword}
 
   h2:
     console:
@@ -69,8 +69,8 @@ spring:
               - email
         provider:
           facebook:
-            authorization-uri: https://www.facebook.com/v22.0/dialog/oauth
-            token-uri: https://graph.facebook.com/v22.0/oauth/access_token
+            authorization-uri: https://www.facebook.com/v25.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v25.0/oauth/access_token
             user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture
             user-name-attribute: id
 
@@ -81,7 +81,7 @@ server:
     session:
       cookie:
         same-site: lax
-        secure: false
+        secure: true
 
 springdoc:
   api-docs:
@@ -106,6 +106,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    mail:
+      enabled: false
 
 vnpay:
   enabled: true
@@ -157,6 +160,8 @@ app:
   oauth2:
     authorized-redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
 
+  redirect-uri: ${APP_REDIRECT_URI:http://localhost:3000}
+
 logging:
   level:
     root: ${LOG_LEVEL:INFO}
@@ -171,3 +176,9 @@ cloudinary:
   cloudName: ${CLOUDINARY_CLOUD_NAME:your-cloud-name}
   apiKey: ${CLOUDINARY_API_KEY:your-api-key}
   apiSecret: ${CLOUDINARY_API_SECRET:your-api-secret}
+
+google:
+  recaptcha:
+    secret-key: "${GOOGLE_RECAPTCHA_SECRET_KEY:your-secret-key}"
+    verify-url: "https://www.google.com/recaptcha/api/siteverify"
+

@@ -1,10 +1,15 @@
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { passwordRegex } from '@/features/auth/utils/auth.utils.ts';
-import { useResetPasswordMutation } from '@/features/auth/services/auth.service.ts';
+import {
+  useResetPasswordMutation,
+  useValidateTokenMutation,
+  useValidateTokenQuery,
+} from '@/features/auth/services/auth.service.ts';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const resetPasswordSchema = z
   .object({
@@ -37,14 +42,20 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPassword() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const resetToken = searchParams.get('token');
 
+  // 1. Validate token when the page loading
+  const { data: isTokenValid, isLoading } = useValidateTokenQuery(resetToken || '');
+
+  // 2. Mutation for double check when submit
+  const validateTokenMutation = useValidateTokenMutation();
   const resetPasswordMutation = useResetPasswordMutation();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting, isDirty, isValid },
+    formState: { errors, isSubmitting, isDirty, isValid: isFormValid },
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     mode: 'onTouched',
@@ -55,19 +66,40 @@ export function ResetPassword() {
   });
 
   const isSubmitDisabled =
-    !resetToken || !isDirty || !isValid || isSubmitting || resetPasswordMutation.isPending;
+    !resetToken || !isDirty || !isFormValid || isSubmitting || resetPasswordMutation.isPending;
 
-  const onSubmit = (data: ResetPasswordFormData) => {
+  const onSubmit = async (data: ResetPasswordFormData) => {
     if (!resetToken) return;
 
-    resetPasswordMutation.mutate({
-      token: resetToken,
-      newPassword: data.newPassword,
-    });
+    try {
+      const stillValid = await validateTokenMutation.mutateAsync(resetToken);
+      if (!stillValid) {
+        toast.error('Token đã hết hạn hoặc không hợp lệ.');
+        navigate('/forgot-password');
+        return;
+      }
+
+      // If valid, call reset password action
+      resetPasswordMutation.mutate({
+        token: resetToken,
+        newPassword: data.newPassword,
+      });
+    } catch {
+      toast.error('Token không hợp lệ hoặc đã hết hạn.');
+      navigate('/forgot-password');
+    }
   };
 
+  if (isLoading) return <p>Đang kiểm tra token...</p>;
+  if (!isTokenValid) {
+    toast.error('Link reset đã hết hạn hoặc đã được sử dụng.');
+    navigate('/forgot-password');
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50 to-blue-100 flex items-center justify-center p-6">
+    <div
+      className="min-h-screen bg-linear-to-br from-slate-100 via-indigo-50 to-blue-100 flex items-center justify-center p-6">
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
         {/* Left Side */}
         <div className="relative hidden md:flex">

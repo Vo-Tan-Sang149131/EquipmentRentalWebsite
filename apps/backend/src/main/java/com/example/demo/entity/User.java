@@ -64,6 +64,11 @@ public class User extends BaseEntity implements Serializable {
     @Builder.Default
     private boolean enabled = false;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn // This is needed to make the foreign key column the primary key
+    private UserProfile profile;
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<UserKycVerification> kycVerifications = new HashSet<>();
@@ -71,4 +76,8 @@ public class User extends BaseEntity implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<CartItem> cartItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserAddress> addresses = new HashSet<>();
 }

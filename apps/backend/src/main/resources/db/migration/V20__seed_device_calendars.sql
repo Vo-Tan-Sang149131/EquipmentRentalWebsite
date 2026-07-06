@@ -1,5 +1,5 @@
 /* =====================================================
-   SEED FILE: V18__seed_device_calendars.sql
+   SEED FILE: V20__seed_device_calendars.sql
    Generated at: 2026-07-01 18:10:14
    ===================================================== */
 

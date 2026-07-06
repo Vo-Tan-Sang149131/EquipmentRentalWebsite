@@ -1,5 +1,5 @@
 /* =====================================================
-   SEED FILE: V16__seed_product_reviews.sql
+   SEED FILE: V18__seed_product_reviews.sql
    Generated at: 2026-07-01 18:10:14
    ===================================================== */
 

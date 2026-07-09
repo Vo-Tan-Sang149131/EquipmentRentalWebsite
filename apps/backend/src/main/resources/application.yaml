@@ -12,6 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    open-in-view: false # Disable Hibernate's open-session-in-view feature'
 
   mail:
     host: smtp.gmail.com
@@ -179,6 +180,6 @@ cloudinary:
 
 google:
   recaptcha:
-    secret-key: "${GOOGLE_RECAPTCHA_SECRET_KEY:your-secret-key}"
-    verify-url: "https://www.google.com/recaptcha/api/siteverify"
+    secret-key: ${GOOGLE_RECAPTCHA_SECRET_KEY:your-secret-key}
+    verify-url: https://www.google.com/recaptcha/api/siteverify
 

@@ -10,11 +10,12 @@ import com.example.demo.dto.user.response.UserResponse;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserKycVerification;
+import com.example.demo.entity.UserProfile;
 import com.example.demo.enumValues.KycStatus;
 import com.example.demo.enumValues.RoleType;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
-import com.example.demo.mappers.IUserMapper;
+import com.example.demo.mappers.UserMapper;
 import com.example.demo.repository.order.OrderRepository;
 import com.example.demo.repository.product.DeviceRepository;
 import com.example.demo.repository.user.RoleRepository;
@@ -28,10 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
-    private final IUserMapper userMapper;
+    private final UserMapper userMapper;
     private final DeviceRepository deviceRepository;
     private final OrderRepository orderRepository;
 
@@ -109,7 +107,19 @@ public class UserService {
             user.setPhoneNumber(request.getPhoneNumber());
         }
 
+        UserProfile profile = user.getProfile();
+        if (profile == null) {
+            profile = UserProfile.builder().user(user).build();
+            user.setProfile(profile);
+        }
+        profile.setGender(request.getGender());
+        profile.setDob(request.getDob());
+        profile.setAddress(request.getAddress());
+        profile.setBio(request.getBio());
+
+        // Based on Cascade.All strategy, the profile will be updated automatically
         userRepository.save(user);
+
     }
 
 
@@ -173,7 +183,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Thêm vào file UserService.java của bạn
     @Transactional(readOnly = true)
     public String revealKycCardNumber(String plainPassword) {
         String currentName = getCurrentUsername();
@@ -203,16 +212,38 @@ public class UserService {
     public UserProfileResponse getUserProfile() {
         String currentName = getCurrentUsername();
 
-        User user = userRepository.findUserWithKycAndRolesByUsername(currentName)
+        User user = userRepository.findUserWithFullDetailsByUsername(currentName)
             .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Find the latest record of KYC verification
         UserKycVerification latestKyc = user.getKycVerifications().stream()
             .max(Comparator.comparing(UserKycVerification::getCreatedAt))
             .orElse(null);
 
         List<String> rolesList = user.getRoles().stream()
             .map(r -> r.getRole().name())
+            .toList();
+
+        UserProfileResponse.ProfileInfo profileInfo = null;
+        if (user.getProfile() != null) {
+            profileInfo = UserProfileResponse.ProfileInfo.builder()
+                .gender(user.getProfile().getGender() != null ? user.getProfile().getGender().name() : null)
+                .dob(user.getProfile().getDob())
+                .address(user.getProfile().getAddress())
+                .bio(user.getProfile().getBio())
+                .build();
+        }
+
+        List<UserProfileResponse.AddressInfo> addressInfoList = user.getAddresses().stream()
+            .map(addr -> UserProfileResponse.AddressInfo.builder()
+                .id(addr.getId())
+                .recipientName(addr.getRecipientName())
+                .phoneNumber(addr.getPhoneNumber())
+                .province(addr.getProvince())
+                .district(addr.getDistrict())
+                .ward(addr.getWard())
+                .detailAddress(addr.getDetailAddress())
+                .isDefault(addr.isDefault())
+                .build())
             .toList();
 
         return UserProfileResponse.builder()
@@ -224,12 +255,15 @@ public class UserService {
             .roles(rolesList)
             .trustScore(user.getTrustScore() != null ? user.getTrustScore().doubleValue() : 5.0)
 
-            // If the user hasn't added KYC, set to 'NOT_STARTED' for frontend filter
+            .profile(profileInfo)
+            .addresses(addressInfoList)
+
             .kycCardNumber(latestKyc != null ? maskIdCardNumber(latestKyc.getIdCardNumber()) : null)
             .kycStatus(latestKyc != null ? latestKyc.getStatus().name() : "NOT_STARTED")
-            .kycVerifiedAt(latestKyc != null && latestKyc.getVerifiedAt() != null ? latestKyc.getVerifiedAt().toString() : null)
+            .kycVerifiedAt(latestKyc != null ? latestKyc.getVerifiedAt() : null)
             .build();
     }
+
 
     private String maskIdCardNumber(String idCardNumber) {
         if (idCardNumber == null || idCardNumber.isBlank()) {
@@ -246,7 +280,7 @@ public class UserService {
 
     // ADMIN helper: list all users (basic info)
     @Transactional(readOnly = true)
-    public java.util.List<com.example.demo.dto.user.response.UserResponse> listAllUsers() {
+    public List<UserResponse> listAllUsers() {
         return userRepository.findAll().stream()
             .map(u -> com.example.demo.dto.user.response.UserResponse.builder()
                 .id(u.getId())
@@ -268,11 +302,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public com.example.demo.dto.user.response.UserResponse getUserDetailForAdmin(Long userId) {
+    public UserResponse getUserDetailForAdmin(Long userId) {
         var user = userRepository.findById(userId)
             .orElseThrow(() -> new com.example.demo.exception.AppException(com.example.demo.exception.ErrorCode.USER_NOT_FOUND));
 
-        return com.example.demo.dto.user.response.UserResponse.builder()
+        return UserResponse.builder()
             .id(user.getId())
             .username(user.getUsername())
             .email(user.getEmail())
@@ -289,7 +323,7 @@ public class UserService {
             .orElseThrow(() -> new com.example.demo.exception.AppException(com.example.demo.exception.ErrorCode.USER_NOT_FOUND));
 
         // Convert role names to Role entities
-        var newRoles = new java.util.HashSet<com.example.demo.entity.Role>();
+        var newRoles = new HashSet<Role>();
         for (String roleName : roleNames) {
             try {
                 var roleType = com.example.demo.enumValues.RoleType.valueOf(roleName.toUpperCase());
@@ -306,7 +340,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.Map<String, Object> getAdminStats() {
+    public Map<String, Object> getAdminStats() {
         var users = userRepository.findAll();
         long totalUsers = users.size();
         long ownerCount = users.stream()

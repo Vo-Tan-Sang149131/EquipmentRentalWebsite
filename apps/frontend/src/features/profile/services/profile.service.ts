@@ -22,8 +22,23 @@ export const useUpdateBasicProfileMutation = () => {
   return useMutation({
     mutationFn: (data: BasicProfileRequest) => {
       const formData = new FormData();
-      if (data.phoneNumber) formData.append('phoneNumber', data.phoneNumber);
-      if (data.avatarFile) formData.append('avatarFile', data.avatarFile);
+      if (data.phoneNumber !== null)
+        formData.append('phoneNumber', data.phoneNumber);
+
+      if (data.avatarFile)
+        formData.append('avatarFile', data.avatarFile);
+
+      if (data.gender !== null)
+        formData.append('gender', data.gender);
+
+      if (data.dob !== null)
+        formData.append('dob', data.dob);
+
+      if (data.address !== null)
+        formData.append('address', data.address);
+
+      if (data.bio !== null)
+        formData.append('bio', data.bio);
       return api.profile.updateBasic(formData);
     },
     onSuccess: () => {

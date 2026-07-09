@@ -57,7 +57,7 @@ services:
     env_file:
       - ./apps/backend/.env
     environment:
-      JAVA_OPTS: '-Xmx512m -Xms256m'
+      JAVA_OPTS: -Xmx512m -Xms256m # 512MB max, 256MB min
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-equipment_rental_db}

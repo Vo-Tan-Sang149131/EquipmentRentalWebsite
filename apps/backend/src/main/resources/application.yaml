@@ -12,7 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    open-in-view: false # Disable Hibernate's open-session-in-view feature'
+    open-in-view: false
 
   mail:
     host: smtp.gmail.com
@@ -28,6 +28,7 @@ spring:
             required: true
           connectiontimeout: 5000
           timeout: 5000
+
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -39,9 +40,10 @@ spring:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:equipment_rental_db}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:root}
+
   data:
     redis:
-      host: ${REDIS_HOST:redis}
+      host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:devpassword}
 
@@ -87,6 +89,7 @@ server:
 springdoc:
   api-docs:
     path: /v3/api-docs
+    enabled: true
   swagger-ui:
     path: /swagger-ui
     enabled: true
@@ -182,4 +185,3 @@ google:
   recaptcha:
     secret-key: ${GOOGLE_RECAPTCHA_SECRET_KEY:your-secret-key}
     verify-url: https://www.google.com/recaptcha/api/siteverify
-

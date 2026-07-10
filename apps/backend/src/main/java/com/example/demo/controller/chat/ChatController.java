@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/chat")
-@Validated
 public class ChatController extends BaseController {
 
     private final ChatService chatService;

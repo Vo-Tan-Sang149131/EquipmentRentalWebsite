@@ -33,7 +33,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@Validated // Enable this for validation annotations Eg: @NotBlank
 @Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthController extends BaseController {
 

@@ -1,0 +1,44 @@
+spring:
+  jpa:
+    show-sql: false
+
+  h2:
+    console:
+      enabled: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+
+logging:
+  level:
+    root: INFO
+    '[com.example]': INFO
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    org.flywaydb: INFO
+
+app:
+  oauth2:
+    authorized-redirect-uri: ${OAUTH2_REDIRECT_URI}
+  redirect-uri: ${APP_REDIRECT_URI}
+
+vnpay:
+  returnUrl: ${VNP_RETURN_URL}
+  ipnUrl: ${VNP_IPN_URL}
+
+momo:
+  return-url: ${MOMO_RETURN_URL}
+  ipn-url: ${MOMO_IPN_URL}

@@ -4,6 +4,8 @@ FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS user_social_accounts;
 DROP TABLE IF EXISTS user_kyc_verifications;
 DROP TABLE IF EXISTS user_roles;
+DROP TABLE IF EXISTS user_profiles;
+DROP TABLE IF EXISTS user_addresses;
 DROP TABLE IF EXISTS device_images;
 DROP TABLE IF EXISTS device_calendars;
 DROP TABLE IF EXISTS payments;
@@ -55,6 +57,17 @@ CREATE TABLE users
     INDEX        idx_username (user_name)
 );
 
+CREATE TABLE user_profiles
+(
+    user_id BIGINT PRIMARY KEY,
+    gender  ENUM('MALE', 'FEMALE', 'OTHER') NULL,
+    dob     DATE NULL, -- Date of birth
+    address VARCHAR(255) NULL,
+    bio     TEXT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE user_social_accounts
 (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -67,6 +80,23 @@ CREATE TABLE user_social_accounts
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     UNIQUE KEY uq_provider_user (provider, provider_user_id) -- Đảm bảo không bị trùng lặp tài khoản social
 );
+
+CREATE TABLE user_addresses
+(
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id        BIGINT       NOT NULL,
+    recipient_name VARCHAR(255) NOT NULL,             -- Tên người nhận (có thể nhờ người khác nhận)
+    phone_number   VARCHAR(15)  NOT NULL,             -- Số điện thoại nhận hàng riêng cho địa chỉ này
+    province       VARCHAR(100) NOT NULL,
+    district       VARCHAR(100) NOT NULL,
+    ward           VARCHAR(100) NOT NULL,
+    detail_address VARCHAR(255) NOT NULL,             -- Số nhà, tên đường
+    is_default     BOOLEAN DEFAULT FALSE,             -- Địa chỉ mặc định
+    created_at     TIMESTAMP    NOT NULL,
+    updated_at     TIMESTAMP    NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE user_kyc_verifications
 (

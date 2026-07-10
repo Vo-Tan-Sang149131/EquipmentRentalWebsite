@@ -1,0 +1,22 @@
+name: Close Stale Tasks
+
+on:
+  schedule:
+    - cron: '30 1 * * *' # Run every day at 1:30 AM
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: 'The issue not updated for 30 days, will be closed automatically after 7 days.'
+          days-before-stale: 30
+          days-before-close: 7
+          stale-pr-message: 'The PR not updated for 14 days, will be closed automatically after 3 days.'
+          days-before-pr-stale: 14
+          days-before-pr-close: 3

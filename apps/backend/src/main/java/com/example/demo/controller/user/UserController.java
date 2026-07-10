@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users/profile")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN') or hasRole('RENTER') or hasRole('OWNER')")
-@Validated
 public class UserController extends BaseController {
 
     private final UserService userService;

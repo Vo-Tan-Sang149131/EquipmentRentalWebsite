@@ -76,10 +76,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtTokenProvider.getUserIdFromToken(jwt);
                 List<String> roles = jwtTokenProvider.getRolesFromToken(jwt);
 
-                // ĐƯA USER VÀO MDC NGAY KHI XÁC ĐỊNH ĐƯỢC USERNAME
                 MDC.put("user", username);
 
-                // STRATEGY 1: Nếu userId có trong token
+                // STRATEGY 1: If userId is present in token, use it to query DB
                 if (userId != null) {
                     CustomUserDetails userDetails = buildCustomUserDetailsFromToken(username, userId, roles);
                     List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
@@ -93,7 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                // STRATEGY 2: Nếu không có userId trong token (OAuth2 login)
+                // STRATEGY 2: For OAuth2 login, userId is not present in token, query DB
                 log.debug("userId not found in token, querying database for user: {}", username);
                 UserDetails userDetailsFromDb = customUserDetailsService.loadUserByUsername(username);
 
@@ -122,16 +121,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     /**
-     * Build CustomUserDetails từ token claims mà không cần query DB
-     * Áp dụng cho traditional login (JWT token có userId)
+     * Build CustomUserDetails from token claims but not from database.
+     * Apply to traditional login via JWT filter
      */
     private CustomUserDetails buildCustomUserDetailsFromToken(String username, Long userId, List<String> roles) {
         List<SimpleGrantedAuthority> authorities = roles.stream()
             .map(SimpleGrantedAuthority::new)
             .toList();
 
-        // Tạo anonymous CustomUserDetails từ token claims
-        // Lưu ý: không có email từ token này, có thể thêm nếu cần
+        // Create abstract custom user details
         return new CustomUserDetails(
             username,
             userId,

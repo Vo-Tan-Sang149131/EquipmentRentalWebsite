@@ -1,5 +1,5 @@
 /* =====================================================
-   SEED FILE: V10__seed_product_images.sql
+   SEED FILE: V12__seed_product_images.sql
    Generated at: 2026-07-01 18:10:14
    ===================================================== */
 

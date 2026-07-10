@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 // Set unmappedTargetPolicy to IGNORE to ignore unmapped properties
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
-public interface IUserMapper {
+public interface UserMapper {
 
     UserResponse mapToResponse(User user);
 

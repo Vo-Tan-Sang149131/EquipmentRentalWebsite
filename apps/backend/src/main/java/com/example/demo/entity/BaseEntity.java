@@ -1,10 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
@@ -18,6 +15,7 @@ import java.time.Instant; // Use Instant instead of LocalDateTime
 @AllArgsConstructor
 @SuperBuilder
 @MappedSuperclass
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // Only calculate hashCode for explicitly included fields
 public abstract class BaseEntity implements Serializable {
 
     @Serial
@@ -25,6 +23,7 @@ public abstract class BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Force hashCode calculation for this field
     protected Long id;
 
     @Column(name = "created_at", nullable = false, updatable = false)

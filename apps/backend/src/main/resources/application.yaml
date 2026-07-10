@@ -169,7 +169,7 @@ app:
 logging:
   level:
     root: ${LOG_LEVEL:INFO}
-    '[com.example]': ${APP_LOG_LEVEL:INFO}
+    '[com.luxrental]': ${APP_LOG_LEVEL:INFO}
     org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:INFO}
     org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
     org.flywaydb: ${FLYWAY_LOG_LEVEL:INFO}

@@ -1,22 +1,17 @@
 version: 2
 updates:
-  # Check for updates to maven packages(backend)
   - package-ecosystem: "maven"
     directory: "/apps/backend"
     schedule:
       interval: "weekly"
 
-  # Check for updates to npm packages(root)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
-
     ignore:
       - update-types: [ "version-update:semver-major" ]
 
-
-  # Check for updates to GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

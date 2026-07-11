@@ -29,6 +29,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.luxrental.config.web.SecurityEndpoints.PUBLIC_MATCHERS;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
@@ -38,21 +40,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationSuccessHandler successHandler;
     private final OAuth2AuthenticationFailureHandler failureHandler;
-
-    private static final String[] PUBLIC_MATCHERS = {
-        "/api/auth/**",
-        "/api/products/**",
-        "/api/lookups/categories",
-        "/api/lookups/brands",
-        "/api/lookups/price-range",
-        "/api/devices/*/detail",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/swagger-resources/**",
-        "/webjars/**",
-        "/actuator/**", // Contain actuator endpoints
-        "/ws-chat/**"
-    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,6 +57,7 @@ public class SecurityConfig {
         http
             // Enable CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Disable CSRF to prevent CSRF attacks
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 

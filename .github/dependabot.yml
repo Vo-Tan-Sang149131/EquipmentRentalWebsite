@@ -12,6 +12,10 @@ updates:
     schedule:
       interval: "weekly"
 
+    ignore:
+      - update-types: [ "version-update:semver-major" ]
+
+
   # Check for updates to GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"

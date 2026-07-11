@@ -14,13 +14,7 @@ import java.util.Locale;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix("/api",
-            handlerType -> handlerType.isAnnotationPresent(RestController.class)
-                && handlerType.getPackage().getName().startsWith("com.luxrental.controller"));
-    }
-
+    
     // Identify language based on the Accept-Language header
     @Bean
     public LocaleResolver localeResolver() {

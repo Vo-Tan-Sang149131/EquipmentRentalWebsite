@@ -3,11 +3,6 @@ package com.luxrental.config;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.test.util.TestSocketUtils;
 import redis.embedded.RedisServer;
 
 import java.io.IOException;
@@ -16,41 +11,23 @@ import java.io.IOException;
 public class TestRedisConfig {
 
     private RedisServer redisServer;
-    private int redisPort;
 
     @PostConstruct
     public void startRedis() throws IOException {
-        // Find an available port
-        redisPort = TestSocketUtils.findAvailableTcpPort();
-
+        // Activate Redis server on port 6379 (default Redis port)
+        redisServer = new RedisServer(6379);
         try {
-            redisServer = new RedisServer(redisPort);
             redisServer.start();
-            System.out.println("Embedded Redis started on port: " + redisPort);
         } catch (Exception e) {
-            System.err.println("Failed to start embedded Redis: " + e.getMessage());
-            throw new RuntimeException("Cannot start embedded Redis server for tests", e);
+            // If Redis is already running, we can ignore the exception and continue with the tests
+            System.out.println("Redis embedded server failed to start, it might be already running: " + e.getMessage());
         }
     }
 
     @PreDestroy
-    public void stopRedis() {
+    public void stopRedis() throws IOException {
         if (redisServer != null) {
-            try {
-                redisServer.stop();
-                System.out.println("Embedded Redis stopped");
-            } catch (Exception e) {
-                System.err.println("Error stopping Redis: " + e.getMessage());
-            }
+            redisServer.stop();
         }
-    }
-
-    @Bean
-    @Primary
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
-        StringRedisTemplate template = new StringRedisTemplate();
-        template.setConnectionFactory(connectionFactory);
-        template.afterPropertiesSet();
-        return template;
     }
 }

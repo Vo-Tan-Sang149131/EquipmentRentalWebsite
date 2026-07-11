@@ -29,9 +29,6 @@ jobs:
       - name: Make Maven wrapper executable
         run: chmod +x ./mvnw
 
-      - name: Clear Maven Cache (Fix corrupt cache)
-        run: ./mvnw clean install -DskipTests -B --no-transfer-progress -Dmaven.repo.local=./.m2/repository
-
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests -B
 

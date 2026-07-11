@@ -1,12 +1,14 @@
 # ☕ Equipment Rental Backend - Spring Boot API
 
-Spring Boot 4.0.6 application with JWT Authentication, Role-Based Access Control (RBAC), Swagger UI documentation, MySQL database integration, and Redis caching for the Equipment Rental System.
+Spring Boot 4.0.6 application with JWT Authentication, Role-Based Access Control (RBAC), Swagger UI documentation, MySQL
+database integration, and Redis caching for the Equipment Rental System.
 
 **Version:** 1.0.0 | **Java:** 21+ | **Spring Boot:** 4.0.6 | **Database:** MySQL 8.0+
 
 ## 🚀 Key Features
 
 ### Security & Authentication
+
 - ✅ **JWT Authentication** - Secure token-based authentication with HS256 algorithm
 - ✅ **Role-Based Access Control (RBAC)** - ADMIN, USER, GUEST roles with fine-grained permissions
 - ✅ **Spring Security** - Stateless API with BCrypt password encoding (12 rounds)
@@ -14,29 +16,34 @@ Spring Boot 4.0.6 application with JWT Authentication, Role-Based Access Control
 - ✅ **CORS Support** - Configured for cross-origin requests
 
 ### API & Documentation
+
 - ✅ **Swagger UI / OpenAPI 3.0** - Interactive API documentation with Bearer token support
 - ✅ **RESTful Endpoints** - Standard HTTP methods (GET, POST, PUT, DELETE)
 - ✅ **Request Validation** - @Valid annotations for input validation
 - ✅ **Error Handling** - Centralized exception handling with custom error responses
 
 ### Database & ORM
+
 - ✅ **MySQL 8.0+** - Persistent data storage
 - ✅ **JPA/Hibernate ORM** - Object-relational mapping
 - ✅ **Automatic DDL** - Tables created/updated on startup
 - ✅ **Database Migrations** - SQL seed scripts for initial data
 
 ### Caching & Performance
+
 - ✅ **Redis Integration** - Session & token caching for improved performance
 - ✅ **Spring Cache Abstraction** - Easy-to-use caching annotations
 - ✅ **Connection Pooling** - HikariCP for MySQL connections
 
 ### Configuration & Utilities
+
 - ✅ **Environment Variables** - .env file support via spring-dotenv
 - ✅ **Conditional Configuration** - Profile-based configuration (dev, test, prod)
 - ✅ **Logging** - SLF4J with configurable levels via application.yaml
 - ✅ **MapStruct** - DTO ↔ Entity mapping with minimal boilerplate
 
 ### Business Features
+
 - ✅ **User Management** - Registration, login, profile management
 - ✅ **Equipment Catalog** - Equipment listing, search, and filtering
 - ✅ **Rental Management** - Equipment rental requests and tracking
@@ -300,36 +307,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
 
 2. **Open Swagger UI**
-   - URL: `http://localhost:8080/swagger-ui.html`
+    - URL: `http://localhost:8080/swagger-ui.html`
 
 3. **Authenticate with Bearer Token**
-   - Click the **"Authorize"** button (top-right corner ⬆️)
-   - Select **"Bearer"** scheme
-   - Paste your JWT token (without "Bearer " prefix):
-     ```
-     eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-     ```
-   - Click **"Authorize"**
+    - Click the **"Authorize"** button (top-right corner ⬆️)
+    - Select **"Bearer"** scheme
+    - Paste your JWT token (without "Bearer " prefix):
+      ```
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      ```
+    - Click **"Authorize"**
 
 4. **Execute Requests**
-   - All requests now include the Authorization header automatically
-   - Click "Try it out" on any endpoint
-   - All fields are pre-filled where applicable
-   - Click "Execute"
+    - All requests now include the Authorization header automatically
+    - Click "Try it out" on any endpoint
+    - All fields are pre-filled where applicable
+    - Click "Execute"
 
 ### Common API Endpoints
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/auth/register` | Create new user | ❌ |
-| `POST` | `/api/auth/login` | Authenticate user | ❌ |
-| `GET` | `/api/users/profile` | Get current user profile | ✅ |
-| `PUT` | `/api/users/profile` | Update user profile | ✅ |
-| `GET` | `/api/equipment` | List all equipment | ❌ |
-| `GET` | `/api/equipment/{id}` | Get equipment details | ❌ |
-| `POST` | `/api/orders` | Create rental order | ✅ |
-| `GET` | `/api/orders/{id}` | Get order details | ✅ |
-| `GET` | `/api/orders` | List user orders | ✅ |
+| Method | Endpoint              | Description              | Auth |
+|--------|-----------------------|--------------------------|------|
+| `POST` | `/api/auth/register`  | Create new user          | ❌    |
+| `POST` | `/api/auth/login`     | Authenticate user        | ❌    |
+| `GET`  | `/api/users/profile`  | Get current user profile | ✅    |
+| `PUT`  | `/api/users/profile`  | Update user profile      | ✅    |
+| `GET`  | `/api/equipment`      | List all equipment       | ❌    |
+| `GET`  | `/api/equipment/{id}` | Get equipment details    | ❌    |
+| `POST` | `/api/orders`         | Create rental order      | ✅    |
+| `GET`  | `/api/orders/{id}`    | Get order details        | ✅    |
+| `GET`  | `/api/orders`         | List user orders         | ✅    |
 
 ### Testing with cURL
 
@@ -360,8 +367,8 @@ curl -X GET http://localhost:8080/api/users/profile \
 
 1. **Create new request** → POST
 2. **URL:** `http://localhost:8080/api/auth/login`
-3. **Headers:** 
-   - `Content-Type: application/json`
+3. **Headers:**
+    - `Content-Type: application/json`
 4. **Body (raw JSON):**
    ```json
    {
@@ -371,10 +378,10 @@ curl -X GET http://localhost:8080/api/users/profile \
    ```
 5. **Send** and copy the `accessToken` from response
 6. **For authenticated requests:**
-   - Go to **Authorization** tab
-   - Select type: **Bearer Token**
-   - Paste the token in the token field
-   - Send request
+    - Go to **Authorization** tab
+    - Select type: **Bearer Token**
+    - Paste the token in the token field
+    - Send request
 
 ---
 
@@ -387,7 +394,7 @@ apps/backend/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/demo/
-│   │   │   ├── DemoApplication.java           # Main Spring Boot entry point
+│   │   │   ├── LuxrentalApplication.java           # Main Spring Boot entry point
 │   │   │   │
 │   │   │   ├── config/
 │   │   │   │   ├── SecurityConfig.java        # Spring Security configuration
@@ -491,18 +498,18 @@ apps/backend/
 
 ### Key Directories Explained
 
-| Directory | Purpose | Key Files |
-|-----------|---------|-----------|
-| `config/` | Spring & application configuration | Security, OpenAPI, Cache configs |
-| `controller/` | REST API endpoints | HTTP request handlers |
-| `service/` | Business logic layer | Complex operations, validations |
-| `entity/` | JPA database models | @Entity annotated classes |
-| `repository/` | Data access layer | Spring Data JPA interfaces |
-| `dto/` | Data transfer objects | Request/Response DTOs |
-| `security/` | Authorization & authentication | JWT, Spring Security |
-| `exception/` | Custom exception classes | Error handling |
-| `mapper/` | Entity ↔ DTO mapping | MapStruct mappers |
-| `util/` | Utility functions | Helpers, validators |
+| Directory     | Purpose                            | Key Files                        |
+|---------------|------------------------------------|----------------------------------|
+| `config/`     | Spring & application configuration | Security, OpenAPI, Cache configs |
+| `controller/` | REST API endpoints                 | HTTP request handlers            |
+| `service/`    | Business logic layer               | Complex operations, validations  |
+| `entity/`     | JPA database models                | @Entity annotated classes        |
+| `repository/` | Data access layer                  | Spring Data JPA interfaces       |
+| `dto/`        | Data transfer objects              | Request/Response DTOs            |
+| `security/`   | Authorization & authentication     | JWT, Spring Security             |
+| `exception/`  | Custom exception classes           | Error handling                   |
+| `mapper/`     | Entity ↔ DTO mapping               | MapStruct mappers                |
+| `util/`       | Utility functions                  | Helpers, validators              |
 
 ---
 
@@ -517,27 +524,28 @@ apps/backend/
 
 ### JWT Token Security
 
-| Property | Value | Description |
-|----------|-------|-------------|
-| **Algorithm** | HS256 (HMAC-SHA256) | Symmetric key signing |
-| **Secret** | 32+ characters | Strong random key from `.env` |
-| **Expiration** | 24 hours default | Configurable via `JWT_EXPIRATION_MS` |
-| **Claims** | username, role, email | User identification & authorization |
-| **Validation** | Token signature verified on every request | Protection against tampering |
+| Property       | Value                                     | Description                          |
+|----------------|-------------------------------------------|--------------------------------------|
+| **Algorithm**  | HS256 (HMAC-SHA256)                       | Symmetric key signing                |
+| **Secret**     | 32+ characters                            | Strong random key from `.env`        |
+| **Expiration** | 24 hours default                          | Configurable via `JWT_EXPIRATION_MS` |
+| **Claims**     | username, role, email                     | User identification & authorization  |
+| **Validation** | Token signature verified on every request | Protection against tampering         |
 
 ### Authorization & Access Control
 
-| Feature | Description | Example |
-|---------|-------------|---------|
-| **Stateless** | No server-side session storage | API-first, scalable design |
-| **Bearer Token** | Token in HTTP `Authorization` header | `Authorization: Bearer <token>` |
-| **RBAC** | Role-Based Access Control | ADMIN, USER, GUEST roles |
-| **Method-Level:** | Fine-grained endpoint protection | `@PreAuthorize("hasRole('ADMIN')")` |
-| **CORS** | Cross-Origin Resource Sharing enabled | Frontend can access API safely |
+| Feature           | Description                           | Example                             |
+|-------------------|---------------------------------------|-------------------------------------|
+| **Stateless**     | No server-side session storage        | API-first, scalable design          |
+| **Bearer Token**  | Token in HTTP `Authorization` header  | `Authorization: Bearer <token>`     |
+| **RBAC**          | Role-Based Access Control             | ADMIN, USER, GUEST roles            |
+| **Method-Level:** | Fine-grained endpoint protection      | `@PreAuthorize("hasRole('ADMIN')")` |
+| **CORS**          | Cross-Origin Resource Sharing enabled | Frontend can access API safely      |
 
 ### HTTPS & Transport Security
 
 For production, ensure:
+
 - ✅ HTTPS enabled (TLS 1.3+)
 - ✅ Secure cookies (HttpOnly, Secure flags)
 - ✅ HSTS headers configured
@@ -552,14 +560,14 @@ For production, ensure:
 
 ### Protection Mechanisms
 
-| Threat | Protection | Implementation |
-|--------|-----------|-----------------|
-| **Unauthorized Access** | JWT token validation | JwtAuthenticationFilter |
-| **Token Tampering** | HS256 signature verification | Token validation on every request |
-| **Brute Force** | Rate limiting (optional) | Can add Spring Security rate limiter |
-| **SQL Injection** | Parameterized queries | Spring Data JPA |
-| **CSRF** | CSRF disabled (stateless API) | No cookies used |
-| **CORS Attacks** | CORS configuration | Restricted origins |
+| Threat                  | Protection                    | Implementation                       |
+|-------------------------|-------------------------------|--------------------------------------|
+| **Unauthorized Access** | JWT token validation          | JwtAuthenticationFilter              |
+| **Token Tampering**     | HS256 signature verification  | Token validation on every request    |
+| **Brute Force**         | Rate limiting (optional)      | Can add Spring Security rate limiter |
+| **SQL Injection**       | Parameterized queries         | Spring Data JPA                      |
+| **CSRF**                | CSRF disabled (stateless API) | No cookies used                      |
+| **CORS Attacks**        | CORS configuration            | Restricted origins                   |
 
 ---
 
@@ -569,63 +577,67 @@ For production, ensure:
 
 ```sql
 -- Users Table
-CREATE TABLE users (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  username VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL COMMENT 'BCrypt hashed password',
-  email VARCHAR(255) UNIQUE NOT NULL,
-  phone VARCHAR(20),
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  role ENUM('ADMIN', 'USER', 'GUEST') NOT NULL DEFAULT 'USER',
-  enabled BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_username (username),
-  INDEX idx_email (email)
+CREATE TABLE users
+(
+    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    username   VARCHAR(255) UNIQUE NOT NULL,
+    password   VARCHAR(255)        NOT NULL COMMENT 'BCrypt hashed password',
+    email      VARCHAR(255) UNIQUE NOT NULL,
+    phone      VARCHAR(20),
+    first_name VARCHAR(100),
+    last_name  VARCHAR(100),
+    role       ENUM('ADMIN', 'USER', 'GUEST') NOT NULL DEFAULT 'USER',
+    enabled    BOOLEAN             NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX      idx_username (username),
+    INDEX      idx_email (email)
 );
 
 -- Equipment Table
-CREATE TABLE equipment (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  category VARCHAR(100) NOT NULL,
-  rental_price_per_day DECIMAL(15, 2) NOT NULL,
-  quantity_available INT NOT NULL DEFAULT 0,
-  image_url VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_category (category)
+CREATE TABLE equipment
+(
+    id                   BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name                 VARCHAR(255)   NOT NULL,
+    description          TEXT,
+    category             VARCHAR(100)   NOT NULL,
+    rental_price_per_day DECIMAL(15, 2) NOT NULL,
+    quantity_available   INT            NOT NULL DEFAULT 0,
+    image_url            VARCHAR(500),
+    created_at           TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP               DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX                idx_category (category)
 );
 
 -- Orders/Rentals Table
-CREATE TABLE orders (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  user_id BIGINT NOT NULL,
-  equipment_id BIGINT NOT NULL,
-  rental_start_date DATE NOT NULL,
-  rental_end_date DATE NOT NULL,
-  total_price DECIMAL(15, 2) NOT NULL,
-  status ENUM('PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'PENDING',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (equipment_id) REFERENCES equipment(id),
-  INDEX idx_user_id (user_id),
-  INDEX idx_status (status)
+CREATE TABLE orders
+(
+    id                BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id           BIGINT         NOT NULL,
+    equipment_id      BIGINT         NOT NULL,
+    rental_start_date DATE           NOT NULL,
+    rental_end_date   DATE           NOT NULL,
+    total_price       DECIMAL(15, 2) NOT NULL,
+    status            ENUM('PENDING', 'CONFIRMED', 'ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'PENDING',
+    created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (equipment_id) REFERENCES equipment (id),
+    INDEX             idx_user_id (user_id),
+    INDEX             idx_status (status)
 );
 
 -- Reviews Table
-CREATE TABLE reviews (
-  id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  user_id BIGINT NOT NULL,
-  equipment_id BIGINT NOT NULL,
-  rating INT NOT NULL COMMENT 'Rating 1-5',
-  comment TEXT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE
+CREATE TABLE reviews
+(
+    id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id      BIGINT NOT NULL,
+    equipment_id BIGINT NOT NULL,
+    rating       INT    NOT NULL COMMENT 'Rating 1-5',
+    comment      TEXT,
+    created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (equipment_id) REFERENCES equipment (id) ON DELETE CASCADE
 );
 ```
 
@@ -753,66 +765,66 @@ APP_LOG_LEVEL=DEBUG
 
 ### Core Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **Spring Boot** | 4.0.6 | Web framework & auto-configuration | compile |
-| **Spring Web** | Latest | REST API & HTTP support | compile |
-| **Spring Security** | Latest | Authentication & authorization | compile |
-| **Spring Data JPA** | Latest | Database abstraction layer | compile |
-| **Spring Validation** | Latest | Input validation (@Valid, @NotNull) | compile |
+| Dependency            | Version | Purpose                             | Scope   |
+|-----------------------|---------|-------------------------------------|---------|
+| **Spring Boot**       | 4.0.6   | Web framework & auto-configuration  | compile |
+| **Spring Web**        | Latest  | REST API & HTTP support             | compile |
+| **Spring Security**   | Latest  | Authentication & authorization      | compile |
+| **Spring Data JPA**   | Latest  | Database abstraction layer          | compile |
+| **Spring Validation** | Latest  | Input validation (@Valid, @NotNull) | compile |
 
 ### Security Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **JJWT API** | 0.13.0 | JWT token creation | compile |
-| **JJWT Impl** | 0.13.0 | JWT implementation | runtime |
-| **JJWT Jackson** | 0.13.0 | JWT JSON support | runtime |
+| Dependency       | Version | Purpose            | Scope   |
+|------------------|---------|--------------------|---------|
+| **JJWT API**     | 0.13.0  | JWT token creation | compile |
+| **JJWT Impl**    | 0.13.0  | JWT implementation | runtime |
+| **JJWT Jackson** | 0.13.0  | JWT JSON support   | runtime |
 
 ### Database Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **MySQL Connector** | Latest | MySQL JDBC driver | runtime |
-| **H2 Database** | Latest | In-memory database for testing | runtime |
-| **Hibernate** | Latest (via Spring Boot) | ORM engine | compile |
+| Dependency          | Version                  | Purpose                        | Scope   |
+|---------------------|--------------------------|--------------------------------|---------|
+| **MySQL Connector** | Latest                   | MySQL JDBC driver              | runtime |
+| **H2 Database**     | Latest                   | In-memory database for testing | runtime |
+| **Hibernate**       | Latest (via Spring Boot) | ORM engine                     | compile |
 
 ### Caching Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **Spring Data Redis** | Latest | Redis integration & caching | compile |
+| Dependency            | Version | Purpose                     | Scope   |
+|-----------------------|---------|-----------------------------|---------|
+| **Spring Data Redis** | Latest  | Redis integration & caching | compile |
 
 ### Documentation & API Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **SpringDoc OpenAPI** | 3.0.2 | Swagger UI & OpenAPI docs | compile |
+| Dependency            | Version | Purpose                   | Scope   |
+|-----------------------|---------|---------------------------|---------|
+| **SpringDoc OpenAPI** | 3.0.2   | Swagger UI & OpenAPI docs | compile |
 
 ### Utility Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **Lombok** | Latest | Reduce boilerplate (@Getter, @Setter) | compile (optional) |
-| **MapStruct** | 1.6.3 | Entity ↔ DTO mapping | compile |
-| **Spring Dotenv** | 5.1.0 | .env file support | compile |
-| **Spring Mail** | Latest | Email notifications | compile |
-| **Cloudinary** | 2.3.2 | Image upload & management | compile |
+| Dependency        | Version | Purpose                               | Scope              |
+|-------------------|---------|---------------------------------------|--------------------|
+| **Lombok**        | Latest  | Reduce boilerplate (@Getter, @Setter) | compile (optional) |
+| **MapStruct**     | 1.6.3   | Entity ↔ DTO mapping                  | compile            |
+| **Spring Dotenv** | 5.1.0   | .env file support                     | compile            |
+| **Spring Mail**   | Latest  | Email notifications                   | compile            |
+| **Cloudinary**    | 2.3.2   | Image upload & management             | compile            |
 
 ### Development Tools
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **Spring Boot DevTools** | Latest | Hot reload & debugging | runtime |
+| Dependency               | Version | Purpose                | Scope   |
+|--------------------------|---------|------------------------|---------|
+| **Spring Boot DevTools** | Latest  | Hot reload & debugging | runtime |
 
 ### Testing Dependencies
 
-| Dependency | Version | Purpose | Scope |
-|-----------|---------|---------|-------|
-| **Spring Boot Test** | Latest | Unit & integration tests | test |
-| **Embedded Redis** | 1.4.3 | Mock Redis for testing | test |
-| **JUnit** | 5+ | Test runner | test |
-| **Mockito** | Latest | Mocking framework | test |
+| Dependency           | Version | Purpose                  | Scope |
+|----------------------|---------|--------------------------|-------|
+| **Spring Boot Test** | Latest  | Unit & integration tests | test  |
+| **Embedded Redis**   | 1.4.3   | Mock Redis for testing   | test  |
+| **JUnit**            | 5+      | Test runner              | test  |
+| **Mockito**          | Latest  | Mocking framework        | test  |
 
 ### Check Installed Versions
 

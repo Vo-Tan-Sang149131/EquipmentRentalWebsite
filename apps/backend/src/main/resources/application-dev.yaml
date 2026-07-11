@@ -1,6 +1,6 @@
 spring:
   jpa:
-    show-sql: true
+    show-sql: false # Disable logging SQL queries to avoid cluttering the console
 
   h2:
     console:
@@ -25,7 +25,7 @@ server:
 logging:
   level:
     root: DEBUG
-    '[com.example]': DEBUG
+    '[com.luxrental]': DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
     org.flywaydb: INFO

@@ -4,7 +4,10 @@ on:
   schedule:
     - cron: '0 0 * * *' # Automatically run at midnight UTC
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
+
+  pull_request:
+    branches: [ main, develop ]
   workflow_dispatch:
 
 jobs:

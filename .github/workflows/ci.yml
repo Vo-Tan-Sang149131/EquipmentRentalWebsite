@@ -29,6 +29,9 @@ jobs:
       - name: Make Maven wrapper executable
         run: chmod +x ./mvnw
 
+      - name: Clear Maven Cache (Fix corrupt cache)
+        run: ./mvnw clean install -DskipTests -B --no-transfer-progress -Dmaven.repo.local=./.m2/repository
+
       - name: Build with Maven
         run: ./mvnw clean package -DskipTests -B
 
@@ -41,7 +44,7 @@ jobs:
         with:
           name: backend-test-results
           path: apps/backend/target/surefire-reports/
-          retention-days: 1 # Keep reports for 1 day
+          retention-days: 1
 
   # Frontend Build & Lint
   frontend:
@@ -58,7 +61,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies (Monorepo)
-        run: npm ci # Run on root to install dependencies for all packages
+        run: npm ci
       - name: Run Lint
         run: npm run lint --workspace=apps/frontend
 

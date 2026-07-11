@@ -1,23 +1,57 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  data:
-    redis:
-      host: redis
-      port: 6379
-
   jpa:
     hibernate:
       ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
-  flyway:
-    enabled: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test@example.com
+    password: test-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  data:
+    redis:
+      host: localhost
+      timeout: 2000ms
+      port: 6379
 
 app:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY:test-secret-key-that-is-long-enough-for-testing-purposes}
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
+
   oauth2:
     authorized-redirect-uri: http://localhost/oauth2/redirect
+
+  redirect-uri: http://localhost:3000
+
+cloudinary:
+  cloud-name: test
+  api-key: test-key
+  api-secret: test-secret
+
+vnpay:
+  enabled: false
+

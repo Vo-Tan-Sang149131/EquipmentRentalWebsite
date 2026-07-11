@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router-dom';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { AppBreadcrumb } from '@/components/layout/AppBreadcrumb.tsx';
 
 export function MainLayout() {
   return (
@@ -9,6 +10,7 @@ export function MainLayout() {
       <Header showSearch={true} />
 
       <main className="flex-1 bg-gray-50">
+        <AppBreadcrumb />
         <Outlet />
       </main>
 

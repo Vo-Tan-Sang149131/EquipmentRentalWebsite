@@ -3,24 +3,21 @@ services:
     image: mysql:8.0
     container_name: equipment-rental-db
     restart: unless-stopped
-    deploy: # Limit RAM usage for the database
+    deploy:
       resources:
         limits:
           memory: 512M
-
-    env_file:
-      - .env # Read from environment variables backend
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_NAME:-equipment_rental_db}
-      MYSQL_USER: ${DB_USER:-root}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: equipment_rental_user
+      MYSQL_PASSWORD: ${DB_USER_PASSWORD}
     ports:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: [ 'CMD', 'mysqladmin', 'ping', '-h', 'localhost' ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}" ]
       timeout: 20s
       retries: 10
       interval: 10s
@@ -31,7 +28,7 @@ services:
     image: redis:7-alpine
     container_name: equipment-rental-cache
     restart: unless-stopped
-    deploy: # Limit RAM usage for the cache
+    deploy:
       resources:
         limits:
           memory: 256M
@@ -39,8 +36,10 @@ services:
       - '6379:6379'
     volumes:
       - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf --requirepass "${REDIS_PASSWORD:-devpassword}"
     healthcheck:
-      test: [ 'CMD', 'redis-cli', 'ping' ]
+      test: [ 'CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-devpassword}', 'ping' ]
       timeout: 3s
       retries: 5
       interval: 5s
@@ -53,26 +52,30 @@ services:
       dockerfile: ./apps/backend/Dockerfile
     container_name: equipment-rental-backend
     restart: unless-stopped
-    deploy: # Limit RAM usage for backend
-      resources:
-        limits:
-          memory: 768M
+    volumes:
+      - ./apps/backend/logs:/app/logs
     env_file:
-      - ./apps/backend/.env # Read from environment variables backend
-
+      - ./apps/backend/.env
     environment:
-      JAVA_OPTS: '-Xmx512m -Xms256m' # Maximum and minimum heap size
+      JAVA_OPTS: -Xmx512m -Xms256m # 512MB max, 256MB min
       DB_HOST: mysql
       DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-equipment_rental_db}
+      DB_USER: equipment_rental_user
+      DB_PASSWORD: ${DB_USER_PASSWORD:-password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-devpassword}
       SERVER_PORT: 8080
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: "DEBUG"
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: "DEBUG"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID: "${FACEBOOK_CLIENT_ID}"
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET: "${FACEBOOK_CLIENT_SECRET}"
+      APP_FLYWAY_AUTO_REPAIR: false
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
+      OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI}
+      APP_REDIRECT_URI: ${APP_REDIRECT_URI}
+      LOG_DIR: ${LOG_DIR:-/app/logs}
     ports:
       - '8080:8080'
     depends_on:
@@ -89,7 +92,7 @@ services:
       dockerfile: ./apps/frontend/Dockerfile
     container_name: equipment-rental-frontend
     restart: unless-stopped
-    deploy: # Limit RAM usage for the frontend
+    deploy:
       resources:
         limits:
           memory: 128M
@@ -100,9 +103,22 @@ services:
     networks:
       - equipment-rental-network
 
+  portainer:
+    image: portainer/portainer-ce:2.39.4
+    container_name: equipment-rental-monitor
+    restart: unless-stopped
+    ports:
+      - '9443:9443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - equipment-rental-network
+
 volumes:
   mysql_data:
   redis_data:
+  portainer_data:
 
 networks:
   equipment-rental-network:

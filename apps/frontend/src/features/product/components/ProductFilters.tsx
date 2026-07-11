@@ -43,7 +43,7 @@ export function ProductFilters({
   const dynamicBrands = brandsData.map(b => b.name);
 
   const absoluteMin = serverPriceRange?.minPrice ?? 0;
-  const absoluteMax = serverPriceRange?.maxPrice ?? 5000000;
+  const absoluteMax = serverPriceRange?.maxPrice ?? 500000;
 
   const toggleBrand = (brand: string) => {
     if (selectedBrands.includes(brand)) {
@@ -62,8 +62,8 @@ export function ProductFilters({
     <>
       <div className="flex justify-between">
         <h2 className="font-bold text-lg">Filters</h2>
-        <button className="text-sm text-blue-600 font-medium hover:underline" onClick={resetFilters}>
-          Clear All
+        <button className="text-sm text-blue-600 font-medium hover:underline cursor-pointer" onClick={resetFilters}>
+          Xóa bộ lọc
         </button>
       </div>
 

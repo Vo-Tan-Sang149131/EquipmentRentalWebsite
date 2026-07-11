@@ -1,3 +1,4 @@
+// src/features/chat/store/useChatStore.ts
 import { create } from 'zustand';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -123,7 +124,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   disconnectWebSocket: () => {
     const { stompClient } = get();
     if (stompClient && stompClient.connected) {
-      stompClient.deactivate();
+      stompClient.deactivate().then(r => {
+        console.log('Deactivated WebSocket:', r);
+      });
       set({ stompClient: null });
       console.log('Disconnected WebSocket.');
     }

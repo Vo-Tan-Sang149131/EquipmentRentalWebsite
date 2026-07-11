@@ -1,6 +1,6 @@
 // @/features/product/services/product.service.ts
 import apiClient from '@/services/api.ts';
-import type { LookupItem, PriceRange, Product, SpringPageResponse } from '../types/product.types';
+import type { DeviceDetail, LookupItem, PriceRange, Product, SpringPageResponse } from '../types/product.types';
 
 interface FetchProductsParams {
   page: number;
@@ -49,5 +49,9 @@ export const productService = {
 
   getPriceRange: async (): Promise<PriceRange> => {
     return apiClient.get('/lookups/price-range');
+  },
+
+  getDeviceDetail: async (id: number | string): Promise<DeviceDetail> => {
+    return apiClient.get(`/devices/${id}/detail`);
   },
 };

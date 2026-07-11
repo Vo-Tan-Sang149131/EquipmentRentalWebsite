@@ -8,7 +8,7 @@
     <version>4.0.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  <groupId>com.example</groupId>
+  <groupId>com.luxrental</groupId>
   <artifactId>backend</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Equipment Rental Backend</name>
@@ -136,12 +136,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Source: https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
 
     <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
     <dependency>
@@ -151,7 +145,6 @@
     </dependency>
 
     <!-- Source: https://mvnrepository.com/artifact/com.github.codemonstur/embedded-redis -->
-    <!-- Used for testing Redis interactions without needing an actual Redis server -->
     <dependency>
       <groupId>com.github.codemonstur</groupId>
       <artifactId>embedded-redis</artifactId>
@@ -182,6 +175,25 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-client</artifactId>
     </dependency>
+
+    <!-- Starter and Core -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+    <!-- Extension for MySQL -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
+    </dependency>
+
+    <!-- Driver MySQL -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
 
     <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
     <dependency>
@@ -251,6 +263,10 @@
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <source>21</source>
+          <target>21</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>

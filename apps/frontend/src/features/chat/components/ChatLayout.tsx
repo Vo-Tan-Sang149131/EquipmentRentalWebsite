@@ -14,7 +14,7 @@ export default function ChatLayout() {
   }, [disconnectWebSocket]);
 
   return (
-    <div className="flex rounded-xl border border-border overflow-hidden h-[calc(100vh-140px)] max-h-[700px] shadow-sm">
+    <div className="flex rounded-xl border border-border overflow-hidden h-[calc(100vh-140px)] max-h-175 shadow-sm">
       <RoomList />
       <ChatWindow />
     </div>

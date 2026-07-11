@@ -1,0 +1,91 @@
+<configuration debug="true">
+  <property name="LOG_DIR" value="${LOG_DIR:-/app/logs}"/>
+
+  <!-- Define a common Pattern with masking capability for sensitive information -->
+  <!-- Regex searches for keywords password or passwd (case-insensitive) and masks the value after with ****** -->
+  <property name="MASKED_PATTERN"
+            value="%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] %logger{36} - %replace(%msg){'(?i)(password|passwd|secret|tokenValue|creditCard)=\s*([^,\s&amp;]+)', '$1=******'}%n"/>
+
+  <!-- ==================== 1. CONSOLE APPENDER ==================== -->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <!-- Replace old %pattern with new MASKED_PATTERN defined above -->
+      <pattern>${MASKED_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ==================== 2. ERROR APPENDER ==================== -->
+  <appender name="ErrorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/error.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/error.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
+    <encoder>
+      <pattern>${MASKED_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ==================== 3. APPLICATION LOG APPENDER ==================== -->
+  <appender name="AppFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/app.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/app.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${MASKED_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ==================== 4. AUTHENTICATION LOG APPENDER ==================== -->
+  <appender name="AuthFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/auth.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/auth.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <!-- Since auth.log does not print class name %logger, we apply replace directly here -->
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] -
+        %replace(%msg){'(?i)(password|passwd|secret)=\s*([^,\s&amp;]+)', '$1=******'}%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- ==================== 5. OAUTH LOG APPENDER ==================== -->
+  <appender name="OAuthFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/oauth.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/oauth.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%X{traceId}] [%X{user}] [%X{ip}] -
+        %replace(%msg){'(?i)(password|passwd|secret)=\s*([^,\s&amp;]+)', '$1=******'}%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- ==================== 6. LOGGER ROUTING ==================== -->
+  <logger name="com.luxrental.service.auth" level="INFO" additivity="false">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="AuthFile"/>
+    <appender-ref ref="ErrorFile"/>
+  </logger>
+
+  <logger name="com.luxrental.security.oauth2" level="INFO" additivity="false">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="OAuthFile"/>
+    <appender-ref ref="ErrorFile"/>
+  </logger>
+
+  <root level="INFO">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="AppFile"/>
+    <appender-ref ref="ErrorFile"/>
+  </root>
+</configuration>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Turn off logback debug mode to keep test logs clean -->
+  <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+
+  <!-- Use only Console Appender for Test environment -->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level [%X{traceId}] %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Apply Console Appender to all packages -->
+  <root level="INFO">
+    <appender-ref ref="Console"/>
+  </root>
+
+  <!-- Enable detailed Hibernate or Security error logs when tests fail -->
+  <logger name="org.springframework.security" level="DEBUG"/>
+  <logger name="org.hibernate.SQL" level="DEBUG"/>
+</configuration>

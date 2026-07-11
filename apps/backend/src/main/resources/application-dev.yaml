@@ -1,0 +1,42 @@
+spring:
+  jpa:
+    show-sql: false # Disable logging SQL queries to avoid cluttering the console
+
+  h2:
+    console:
+      enabled: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+
+logging:
+  level:
+    root: DEBUG
+    '[com.luxrental]': DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.flywaydb: INFO
+
+app:
+  oauth2:
+    authorized-redirect-uri: http://localhost:5173/oauth2/redirect
+  redirect-uri: http://localhost:5173
+
+vnpay:
+  returnUrl: http://localhost:5173/checkout/vnpay-callback
+
+momo:
+  return-url: http://localhost:5173/checkout/momo-callback

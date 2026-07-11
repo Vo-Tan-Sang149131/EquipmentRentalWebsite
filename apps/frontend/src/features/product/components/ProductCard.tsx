@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'; // 1. NHỚ IMPORT LINK
 import { type Product } from '@/features/product/types/product.types.ts';
 
 interface ProductProps {
@@ -5,19 +6,24 @@ interface ProductProps {
 }
 
 export default function ProductCard({ product }: ProductProps) {
-  return (
-    <div className="bg-white border rounded-xl overflow-hidden flex flex-col group hover:shadow-lg transition">
-      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+  const isAvailable = product.status === 'AVAILABLE';
+
+  const cardClasses = `bg-white border rounded-xl overflow-hidden flex flex-col group transition ${
+    isAvailable ? 'hover:shadow-lg cursor-pointer' : 'opacity-75 cursor-not-allowed'
+  }`;
+
+  const renderContent = () => (
+    <>
+      <div className="relative aspect-4/3 overflow-hidden bg-gray-100">
         <img
           src={product.primaryImageUrl || 'https://placehold.co'}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+          className={`w-full h-full object-cover transition duration-300 ${isAvailable ? 'group-hover:scale-105' : ''}`}
         />
-        {/* Display status badge */}/
         <span className={`absolute top-3 left-3 text-white px-2 py-1 text-xs rounded font-medium ${
-          product.status === 'AVAILABLE' ? 'bg-green-500' : 'bg-gray-500'
+          isAvailable ? 'bg-green-500' : 'bg-gray-500'
         }`}>
-          {product.status === 'AVAILABLE' ? 'Còn máy' : 'Hết máy'}
+          {isAvailable ? 'Còn máy' : 'Hết máy'}
         </span>
       </div>
 
@@ -26,8 +32,7 @@ export default function ProductCard({ product }: ProductProps) {
           {product.brandName || 'Đang cập nhật'}
         </span>
 
-        {/* Display product name with line-clamp */}
-        <h3 className="font-semibold text-base text-slate-800 line-clamp-2 min-h-[3rem]">
+        <h3 className="font-semibold text-base text-slate-800 line-clamp-2 min-h-12">
           {product.name}
         </h3>
 
@@ -40,12 +45,27 @@ export default function ProductCard({ product }: ProductProps) {
             </span>
           </div>
 
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shrink-0">
-            Rent Now
-          </button>
+          <span
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 text-white ${
+              isAvailable
+                ? 'bg-blue-600 group-hover:bg-blue-700'
+                : 'bg-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {isAvailable ? 'Xem chi tiết' : 'Tạm hết máy'}
+          </span>
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  if (!isAvailable) {
+    return <div className={cardClasses}>{renderContent()}</div>;
+  }
+
+  return (
+    <Link to={`/products/${product.id}`} className={cardClasses}>
+      {renderContent()}
+    </Link>
   );
 }

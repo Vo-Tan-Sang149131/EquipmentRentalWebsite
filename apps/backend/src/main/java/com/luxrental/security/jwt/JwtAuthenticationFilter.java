@@ -1,9 +1,11 @@
 package com.luxrental.security.jwt;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import com.luxrental.common.dto.MyApiResponse;
+import com.luxrental.config.web.SecurityEndpoints;
 import com.luxrental.exception.ErrorCode;
 import com.luxrental.security.normal.CustomUserDetails;
 import com.luxrental.security.normal.CustomUserDetailsService;
@@ -41,12 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/swagger-ui")
-            || path.startsWith("/v3/api-docs")
-            || path.startsWith("/swagger-resources")
-            || path.startsWith("/webjars")
-            || path.startsWith("/h2-console")
-            || path.startsWith("/api/auth");
+        return Arrays.stream(SecurityEndpoints.JWT_FILTER_EXCLUDED)
+            .anyMatch(path::startsWith);
     }
 
     @Override

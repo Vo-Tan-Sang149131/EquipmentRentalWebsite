@@ -41,7 +41,7 @@ jobs:
         with:
           name: backend-test-results
           path: apps/backend/target/surefire-reports/
-          retention-days: 1 # Keep reports for 1 day
+          retention-days: 1
 
   # Frontend Build & Lint
   frontend:
@@ -58,7 +58,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies (Monorepo)
-        run: npm ci # Run on root to install dependencies for all packages
+        run: npm ci
       - name: Run Lint
         run: npm run lint --workspace=apps/frontend
 

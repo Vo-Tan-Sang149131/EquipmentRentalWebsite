@@ -24,7 +24,7 @@ export default defineConfig({
       '/api': {
         target: 'http://equipment-rental-backend:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/equipment_rental/api'),
+        rewrite: (path) => path.replace(/^\/api/, '/equipment_rental/api/v1'),
       },
       '/ws-chat': {
         target: 'http://equipment-rental-backend:8080',

@@ -192,8 +192,8 @@ export const api = {
     checkDuplicateUsername: (username: string): Promise<boolean> =>
       apiClient.get('/auth/check-username', { params: { username } }),
 
-    googleLoginUrl: 'http://localhost:8080/equipment_rental/oauth2/authorization/google',
-    facebookLoginUrl: 'http://localhost:8080/equipment_rental/oauth2/authorization/facebook',
+    googleLoginUrl: 'http://localhost:8080/equipment_rental/api/v1/oauth2/authorization/google',
+    facebookLoginUrl: 'http://localhost:8080/equipment_rental/api/v1/oauth2/authorization/facebook',
   },
   profile: {
     // API to retrieve all the user profile information

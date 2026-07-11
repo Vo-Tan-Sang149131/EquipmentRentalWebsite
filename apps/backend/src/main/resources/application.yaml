@@ -80,7 +80,7 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: /equipment_rental
+    context-path: /equipment_rental/api/v1
     session:
       cookie:
         same-site: lax
@@ -162,9 +162,9 @@ app:
     auto-repair: ${APP_FLYWAY_AUTO_REPAIR:false}
 
   oauth2:
-    authorized-redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
+    authorized-redirect-uri: ${OAUTH2_REDIRECT_URI}
 
-  redirect-uri: ${APP_REDIRECT_URI:http://localhost:3000}
+  redirect-uri: ${APP_REDIRECT_URI}
 
 logging:
   level:

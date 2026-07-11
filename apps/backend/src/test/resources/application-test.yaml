@@ -21,3 +21,5 @@ spring:
 app:
   oauth2:
     authorized-redirect-uri: http://localhost/oauth2/redirect
+
+  redirect-uri: http://localhost

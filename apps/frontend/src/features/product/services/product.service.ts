@@ -47,8 +47,15 @@ export const productService = {
     return apiClient.get('/lookups/brands');
   },
 
-  getPriceRange: async (): Promise<PriceRange> => {
-    return apiClient.get('/lookups/price-range');
+  getPriceRange: async (categoryName: string | null | undefined): Promise<PriceRange> => {
+
+    const formattedCategory = categoryName === 'All' ? undefined : categoryName;
+
+    return apiClient.get('/lookups/price-range', {
+      params: {
+        categoryName: formattedCategory,
+      },
+    });
   },
 
   getDeviceDetail: async (id: number | string): Promise<DeviceDetail> => {

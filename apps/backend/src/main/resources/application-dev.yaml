@@ -6,6 +6,9 @@ spring:
     console:
       enabled: true
 
+  flyway:
+    locations: classpath:db/migration/schema,classpath:db/migration/data/dev # Load extra seed data while on dev
+
   data:
     redis:
       host: ${REDIS_HOST:redis}

@@ -6,6 +6,9 @@ spring:
     console:
       enabled: false
 
+  flyway:
+    locations: classpath:db/migration/schema # Only run schema migration scripts on production
+
   data:
     redis:
       host: ${REDIS_HOST:redis}

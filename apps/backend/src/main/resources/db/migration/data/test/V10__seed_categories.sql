@@ -1,0 +1,12 @@
+/* =====================================================
+   SEED FILE: V10__seed_categories.sql
+   Generated at: 2026-07-12 13:52:32
+   ===================================================== */
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+INSERT INTO categories (id, name, slug, description, created_at, updated_at) VALUES (1, 'Cameras', 'cameras', 'Digital Camera Bodies', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO categories (id, name, slug, description, created_at, updated_at) VALUES (2, 'Lenses', 'lenses', 'Camera Lenses and Optics', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO categories (id, name, slug, description, created_at, updated_at) VALUES (3, 'Camera Supports', 'camera-supports', 'Camera Supports and Accessories', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+SET FOREIGN_KEY_CHECKS = 1;

@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -155,12 +156,11 @@ public class ProductService {
             .min(BigDecimal::compareTo)
             .orElse(null);
 
-        if (minPrice != null) {
-            product.setBasePrice(minPrice);
-            productRepository.save(product);
-        }
+        // CHỈ CẬP NHẬT KHI CÓ GIÁ THỰC TẾ
+        product.setBasePrice(Objects.requireNonNullElse(minPrice, BigDecimal.ZERO));
 
-        product.setBasePrice(minPrice);
+        // Chỉ gọi save đúng 1 lần duy nhất ở cuối hàm
         productRepository.save(product);
     }
+
 }

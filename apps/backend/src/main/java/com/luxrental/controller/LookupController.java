@@ -7,6 +7,7 @@ import com.luxrental.service.product.BrandService;
 import com.luxrental.service.product.CategoryService;
 import com.luxrental.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +30,30 @@ public class LookupController extends BaseController {
         return createResponse(HttpStatus.OK, 1000, "Success", categoryLookupService.getAllCategories());
     }
 
+    // This api can be used to get brands by category name or all brands
     @GetMapping("/brands")
-    public ResponseEntity<MyApiResponse<List<LookupResponse>>> getBrands() {
-        return createResponse(HttpStatus.OK, 1000, "Success", brandLookupService.getAllBrands());
+    public ResponseEntity<MyApiResponse<List<LookupResponse>>> getBrands(
+        @RequestParam(required = false) String categoryName) {
+        String cleanCategory = (categoryName != null && !categoryName.isBlank() && !"All".equalsIgnoreCase(categoryName.trim()))
+            ? categoryName.trim()
+            : null;
+
+        List<LookupResponse> brands = (cleanCategory == null)
+            ? brandLookupService.getAllBrands()
+            : brandLookupService.getBrandsByCategory(cleanCategory);
+
+        return createResponse(HttpStatus.OK, 1000, "Success", brands);
     }
+
 
     @GetMapping("/price-range")
     public ResponseEntity<MyApiResponse<PriceRangeResponse>> getPriceRange(@RequestParam(required = false) String categoryName) {
-        return createResponse(HttpStatus.OK, 1000, "Success", productService.getProductPriceRange(categoryName));
+        String cleanCategory = (categoryName != null && !categoryName.isBlank() && !"All".equalsIgnoreCase(categoryName.trim()))
+            ? categoryName.trim()
+            : null;
+
+        return createResponse(HttpStatus.OK, 1000, "Success", productService.getProductPriceRange(cleanCategory));
     }
+
 
 }

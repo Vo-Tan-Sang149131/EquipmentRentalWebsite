@@ -39,4 +39,10 @@ public class BrandService {
     public void deleteBrand(Long id) {
         brandRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<LookupResponse> getBrandsByCategory(String categoryName) {
+        return brandRepository.findBrandsByCategory(categoryName);
+    }
+
 }

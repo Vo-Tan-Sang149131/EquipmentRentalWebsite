@@ -17,11 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
                 COALESCE(MIN(p.base_price), 50000.00) as minPrice,
                 COALESCE(MAX(p.base_price), 3000000.00) as maxPrice
             FROM products p
-            LEFT JOIN categories c ON p.category_id = c.id
-                AND (:categoryName IS NULL OR c.name = :categoryName)
+            INNER JOIN categories c ON p.category_id = c.id
             WHERE p.base_price IS NOT NULL
               AND p.base_price > 0
-              AND (:categoryName IS NULL OR c.id IS NOT NULL)
+              AND (:categoryName IS NULL OR c.name = :categoryName)
         """, nativeQuery = true)
     PriceRangeResponse findPriceRangeByCategory(@Param("categoryName") String categoryName);
 

@@ -20,6 +20,7 @@ export function HomePage() {
   console.log('products', products);
   const categories = categoriesData || [];
 
+
   return (
     <div className="w-full bg-slate-50 min-h-screen">
       {/* Hero Section */}

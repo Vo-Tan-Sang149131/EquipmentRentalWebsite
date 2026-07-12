@@ -180,7 +180,6 @@ export function DashboardLayout() {
   );
 }
 
-// Thêm ShieldCheck import để không bị lỗi
 function ShieldCheck({ className }: { className?: string }) {
   return (
     <svg

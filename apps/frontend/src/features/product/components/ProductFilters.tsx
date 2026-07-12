@@ -32,12 +32,13 @@ export function ProductFilters({
   });
 
   const { data: brandsData = [], isLoading: isLoadingBrands } = useQuery({
-    queryKey: ['lookup-brands'],
-    queryFn: productService.getBrands,
+    queryKey: ['lookup-brands', selectedCategory], // Add value for react query cache key
+    queryFn: () => productService.getBrands(selectedCategory),
   });
 
-  const { data: serverPriceRange } = useQuery({
-    queryKey: ['lookup-price-range'],
+
+  const { data: serverPriceRange, isLoading: isLoadingPrice } = useQuery({
+    queryKey: ['lookup-price-range', selectedCategory], // Add value for react query cache key
     queryFn: () => productService.getPriceRange(selectedCategory),
   });
 
@@ -47,12 +48,7 @@ export function ProductFilters({
   const absoluteMin = serverPriceRange?.minPrice ?? DEFAULT_PRICE_RANGE[0];
   const absoluteMax = serverPriceRange?.maxPrice ?? DEFAULT_PRICE_RANGE[1];
 
-  const [localRange, setLocalRange] = useState<[number, number]>(() => {
-    return [
-      Number(new URLSearchParams(window.location.search).get('minPrice')) || absoluteMin,
-      Number(new URLSearchParams(window.location.search).get('maxPrice')) || absoluteMax,
-    ];
-  });
+  const [localRange, setLocalRange] = useState<[number, number]>([absoluteMin, absoluteMax]);
 
 
   useEffect(() => {
@@ -61,13 +57,13 @@ export function ProductFilters({
     const urlMax = urlParams.get('maxPrice');
 
     if (urlMin && urlMax) {
-      // Nếu trên URL đang có khoảng giá, hiển thị theo URL
       setLocalRange([Number(urlMin), Number(urlMax)]);
     } else {
-      // Nếu URL trống (như từ trang chủ sang hoặc bấm Xóa bộ lọc), lấy thẳng min/max của danh mục đó từ Server
       setLocalRange([absoluteMin, absoluteMax]);
     }
   }, [priceRange, serverPriceRange, absoluteMin, absoluteMax]);
+
+
   const toggleBrand = (brand: string) => {
     if (selectedBrands.includes(brand)) {
       onBrandChange(selectedBrands.filter((b) => b !== brand));
@@ -76,7 +72,7 @@ export function ProductFilters({
     }
   };
 
-  if (isLoadingCats || isLoadingBrands) {
+  if (isLoadingCats || isLoadingBrands || isLoadingPrice) {
     return <div className="text-gray-400 text-sm p-4">Đang tải bộ lọc...</div>;
   }
 
@@ -109,14 +105,15 @@ export function ProductFilters({
         <div className="flex flex-col gap-2 mt-2 text-left">
           <h2 className="font-semibold text-sm text-gray-700">Price Range</h2>
 
-          {Array.isArray(localRange) && localRange.length === 2 ? (
+          {/* And condtion render slider if localRange is valid */}
+          {Array.isArray(localRange) && localRange.length === 2 && localRange[0] <= localRange[1] ? (
             <Slider
-              key={`${absoluteMin}-${absoluteMax}-${selectedCategory}`} // Ép re-mount khi đổi danh mục
+              key={`${absoluteMin}-${absoluteMax}-${selectedCategory}`}
               range
               min={absoluteMin}
               max={absoluteMax}
               step={50000}
-              value={localRange} // Chạy mượt theo State cục bộ
+              value={localRange}
               onChange={(value) => setLocalRange(value as [number, number])}
               onChangeComplete={(value) => onPriceRangeChange(value as [number, number])}
             />
@@ -135,18 +132,16 @@ export function ProductFilters({
         <h2 className="font-semibold text-sm text-gray-700 mb-2">Brand</h2>
         <ul className="space-y-2">
           {dynamicBrands.map((brand) => (
-            <li key={brand} className="flex items-center text-sm">
-              <input
-                type="checkbox"
-                id={brand}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => toggleBrand(brand)}
-              />
-              <label htmlFor={brand} className="ml-2 text-gray-600 cursor-pointer select-none">
-                {brand}
-              </label>
-            </li>
+            <div
+              key={brand}
+              onClick={() => toggleBrand(brand)}
+              className={`inline-block px-3 py-1 rounded-full border cursor-pointer text-sm
+              ${selectedBrands.includes(brand) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}
+              `}
+            >
+              {brand}
+            </div>
+
           ))}
         </ul>
       </div>

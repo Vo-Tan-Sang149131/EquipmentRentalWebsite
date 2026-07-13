@@ -14,13 +14,11 @@ public class TestRedisConfig {
 
     @PostConstruct
     public void startRedis() throws IOException {
-        // Activate Redis server on port 6379 (default Redis port)
-        redisServer = new RedisServer(6379);
+        redisServer = new RedisServer(63790);
         try {
             redisServer.start();
         } catch (Exception e) {
-            // If Redis is already running, we can ignore the exception and continue with the tests
-            System.out.println("Redis embedded server failed to start, it might be already running: " + e.getMessage());
+            System.out.println("Redis embedded server failed to start: " + e.getMessage());
         }
     }
 

@@ -1,23 +1,24 @@
 version: 2
 updates:
-  # Check for updates to maven packages(backend)
   - package-ecosystem: "maven"
     directory: "/apps/backend"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Vo-Tan-Sang149131"
 
-  # Check for updates to npm packages(root)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-
+      interval: "daily"
     ignore:
-      - update-types: [ "version-update:semver-major" ]
+      - dependency-name: "*"
+        update-types: [ "version-update:semver-major" ]
+    open-pull-requests-limit: 10
 
-
-  # Check for updates to GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 5

@@ -43,13 +43,22 @@ export const productService = {
     return apiClient.get('/lookups/categories');
   },
 
-  getBrands: async (): Promise<LookupItem[]> => {
-    return apiClient.get('/lookups/brands');
+  getBrands: async (categoryName: string | null | undefined): Promise<LookupItem[]> => {
+    return apiClient.get('/lookups/brands', {
+      params: {
+        categoryName: categoryName,
+      },
+    });
   },
 
-  getPriceRange: async (): Promise<PriceRange> => {
-    return apiClient.get('/lookups/price-range');
+  getPriceRange: async (categoryName: string | null | undefined): Promise<PriceRange> => {
+    return apiClient.get('/lookups/price-range', {
+      params: {
+        categoryName: categoryName,
+      },
+    });
   },
+
 
   getDeviceDetail: async (id: number | string): Promise<DeviceDetail> => {
     return apiClient.get(`/devices/${id}/detail`);

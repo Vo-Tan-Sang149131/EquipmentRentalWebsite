@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -67,11 +68,12 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public List<ProductResponse> getTop4RelatedProducts(String categoryName, Long currentProductId) {
-        // 1. Tìm tất cả sản phẩm cùng danh mục nhưng loại trừ sản phẩm đang xem
-        // (Bạn có thể viết câu query này trong ProductRepository)
-        List<Product> rawRelated = productRepository.findTop4ByCategoryNameAndIdNot(categoryName, currentProductId, org.springframework.data.domain.PageRequest.of(0, 4));
+        List<Product> rawRelated = productRepository.findByCategoryNameAndIdNot(
+            categoryName,
+            currentProductId,
+            PageRequest.of(0, 4)
+        );
 
-        // 2. Map sang ProductResponse y hệt như hàm getProducts của bạn
         return rawRelated.stream().map(product -> {
             String primaryUrl = product.getImages().stream()
                 .filter(ProductImage::isPrimary)
@@ -136,22 +138,10 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public PriceRangeResponse getProductPriceRange() {
-        List<Product> allProducts = productRepository.findAll();
+    public PriceRangeResponse getProductPriceRange(String categoryName) {
+        String formattedCategory = (categoryName != null && !categoryName.isBlank()) ? categoryName.trim() : null;
 
-        BigDecimal min = allProducts.stream()
-            .map(Product::getBasePrice)
-            .filter(price -> price != null && price.compareTo(BigDecimal.ZERO) > 0)
-            .min(BigDecimal::compareTo)
-            .orElse(BigDecimal.valueOf(10000)); // Default value
-
-        BigDecimal max = allProducts.stream()
-            .map(Product::getBasePrice)
-            .filter(Objects::nonNull)
-            .max(BigDecimal::compareTo)
-            .orElse(BigDecimal.valueOf(500000)); // Default value
-
-        return new PriceRangeResponse(min, max);
+        return productRepository.findPriceRangeByCategory(formattedCategory);
     }
 
 
@@ -164,9 +154,12 @@ public class ProductService {
             .filter(device -> device.getStatus() == DeviceStatus.APPROVED)
             .map(Device::getPricePerDay)
             .min(BigDecimal::compareTo)
-            .orElse(BigDecimal.ZERO);
+            .orElse(null);
 
-        product.setBasePrice(minPrice);
+        // Only update if minPrice is not null
+        product.setBasePrice(Objects.requireNonNullElse(minPrice, BigDecimal.ZERO));
+
         productRepository.save(product);
     }
+
 }

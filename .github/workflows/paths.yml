@@ -1,0 +1,40 @@
+name: Paths
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      root: ${{ steps.filter.outputs.root }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'apps/backend/**'
+            frontend:
+              - 'apps/frontend/**'
+            root:
+              - 'package.json'
+              - 'package-lock.json'
+              - 'npm-shrinkwrap.json'
+              - '.github/workflows/**'

@@ -25,7 +25,7 @@ export function useProductFilter() {
     return min && max ? [Number(min), Number(max)] : DEFAULT_PRICE_RANGE;
   }, [searchParams]);
 
-  const sortField = (searchParams.get('sortField') as 'name' | 'price') || 'price';
+  const sortField = (searchParams.get('sortField') as 'name' | 'price') || 'name';
   const sortDirection = (searchParams.get('sortDirection') as 'asc' | 'desc') || 'asc';
 
   // --- 2. Helper method to update URL Params ---
@@ -51,7 +51,7 @@ export function useProductFilter() {
   // --- 3. Dispatchers interactive with UI --
   const setSearchQuery = (keyword: string) => updateParams({ keyword });
   const setCurrentPage = (page: number) => updateParams({ page: page.toString() });
-  const setSelectedCategory = (category: string) => updateParams({ category });
+  const setSelectedCategory = (category: string) => updateParams({ category, minPrice: null, maxPrice: null });
   const setSelectedBrands = (brands: string[]) => updateParams({ brands });
   const setSortField = (field: 'name' | 'price') => updateParams({ sortField: field });
   const setPriceRange = (range: [number, number]) => {

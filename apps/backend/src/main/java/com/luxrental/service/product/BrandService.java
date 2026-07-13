@@ -4,6 +4,7 @@ import com.luxrental.controller.product.dto.core.response.LookupResponse;
 import com.luxrental.entity.common.Brand;
 import com.luxrental.repository.product.BrandRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +39,17 @@ public class BrandService {
     @Transactional
     public void deleteBrand(Long id) {
         brandRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LookupResponse> getBrandsByCategory(String categoryName) {
+        return brandRepository.findBrandsByCategory(categoryName);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LookupResponse> getTopBrands(int limit) {
+
+        PageRequest request = PageRequest.of(0, limit);
+        return brandRepository.findTopBrands(request);
     }
 }

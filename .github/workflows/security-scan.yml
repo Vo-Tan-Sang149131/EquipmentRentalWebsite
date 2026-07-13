@@ -2,39 +2,54 @@ name: Security Scan
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Automatically run at midnight UTC
+    - cron: '0 0 * * *'
   push:
     branches: [ main, develop ]
-
   pull_request:
     branches: [ main, develop ]
+    types: [ opened, synchronize, reopened, ready_for_review ]
   workflow_dispatch:
 
 jobs:
   repo-scan:
     name: Scan Code & Secrets
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Ensure Java 21 is installed
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: 'maven' # Activator cache Maven dependencies: ~/.m2/
+          cache: 'maven'
+          cache-dependency-path: 'apps/backend/pom.xml'
 
-      # Run this step to install the dependencies
       - name: Resolve Maven Dependencies
         run: mvn dependency:resolve -f apps/backend/pom.xml
 
       - name: Run Trivy Security Scanner
+        id: trivy-scan
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: 'apps/backend'
+          scan-type: fs
+          scan-ref: apps/backend
+          format: table
+          severity: CRITICAL,HIGH
           ignore-unfixed: true
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
+      - name: Send Discord Notification On Vulnerabilities
+        if: failure() && steps.trivy-scan.outcome == 'failure'
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: >-
+            ⚠️ **[SECURITY ALERT]** Trivy detected critical or high-severity vulnerabilities in the `${{ github.repository }}` repository
+            (branch: `${{ github.ref_name }}`).
+            View the full workflow run here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

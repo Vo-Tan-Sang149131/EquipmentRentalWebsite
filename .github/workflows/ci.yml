@@ -1,109 +1,113 @@
-name: CI Pipeline
+name: CI
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
 
 jobs:
-  # Backend Build & Test
+  paths:
+    uses: /.github/workflows/paths.yml
+
   backend:
-    name: Backend - Build & Test
+    name: Backend Build and Test
     runs-on: ubuntu-latest
+    needs: paths
+    if: needs.paths.outputs.backend == 'true' || needs.paths.outputs.root == 'true'
+    timeout-minutes: 20
     defaults:
       run:
-        working-directory: ./apps/backend/
+        working-directory: apps/backend
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: temurin
           cache: maven
+          cache-dependency-path: apps/backend/pom.xml
 
       - name: Make Maven wrapper executable
         run: chmod +x ./mvnw
 
-      - name: Build with Maven
-        run: ./mvnw clean package -DskipTests -B
+      - name: Run backend tests
+        run: ./mvnw clean verify -B
 
-      - name: Run Tests
-        run: ./mvnw test -B
-
-      - name: Upload Coverage Reports
+      - name: Upload backend test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: backend-test-results
+          name: backend-test-reports
           path: apps/backend/target/surefire-reports/
           retention-days: 1
 
-  # Frontend Build & Lint
   frontend:
-    name: Frontend - Build & Lint
+    name: Frontend Build and Lint
     runs-on: ubuntu-latest
+    needs: paths
+    if: needs.paths.outputs.frontend == 'true' || needs.paths.outputs.root == 'true'
+    timeout-minutes: 20
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: package-lock.json
 
-      - name: Install Dependencies (Monorepo)
+      - name: Install dependencies
         run: npm ci
-      - name: Run Lint
+
+      - name: Run lint
         run: npm run lint --workspace=apps/frontend
 
-      - name: Build
+      - name: Build frontend
         run: npm run build --workspace=apps/frontend
 
-      - name: Upload Build Artifacts
+      - name: Upload frontend build
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: apps/frontend/dist/
+          retention-days: 1
 
-  # Integration Check
   integration:
     name: Integration Check
     runs-on: ubuntu-latest
     needs: [ backend, frontend ]
     if: always()
+    timeout-minutes: 10
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Download Backend Tests
+      - name: Download backend reports
+        if: needs.backend.result == 'success'
         uses: actions/download-artifact@v4
         with:
-          name: backend-test-results
-          path: ./backend-test-results
+          name: backend-test-reports
+          path: ./backend-test-reports
 
-      - name: Download Frontend Build
+      - name: Download frontend build
+        if: needs.frontend.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: ./frontend-build
 
-      - name: Check Artifacts
+      - name: Write summary
         run: |
-          echo "✓ Backend tests completed"
-          echo "✓ Frontend build completed"
-          ls -la backend-test-results/ || echo "No backend tests"
-          ls -la frontend-build/ || echo "No frontend build"
-
-      - name: Summary
-        run: |
-          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## CI Summary" >> $GITHUB_STEP_SUMMARY
           echo "- Backend: ${{ needs.backend.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- Frontend: ${{ needs.frontend.result }}" >> $GITHUB_STEP_SUMMARY

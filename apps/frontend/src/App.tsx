@@ -1,5 +1,5 @@
 // App.tsx
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { HomePage } from '@/features/home/pages/HomePage.tsx';
 import { LoginPage } from '@/features/auth/pages/LoginPage.tsx';
 import { RegisterPage } from '@/features/auth/pages/RegisterPage.tsx';
@@ -34,67 +34,76 @@ import AdminOrdersPage from '@/features/admin/pages/AdminOrdersPage.tsx';
 import AdminPaymentsPage from '@/features/admin/pages/AdminPaymentsPage.tsx';
 import AdminIssuesPage from '@/features/admin/pages/AdminIssuesPage.tsx';
 import { MessagePage } from '@/features/chat/pages/MessagePage.tsx';
+import { AnimatePresence } from 'motion/react';
 
 
 function App() {
+  const location = useLocation(); // 1. Lấy vị trí URL hiện tại
+
   return (
-    <Routes>
-      {/* 1. Standard Public Routes */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/products" element={<ProductCatalogPage />} />
-        <Route path="/products/:id" element={<ProductDetailPage />} />
-      </Route>
+    // 2. Bọc toàn bộ Routes để kích hoạt tính năng Unmount Animation
+    <AnimatePresence mode="wait">
+      {/* 3. Truyền location và key vào thẻ Routes */}
+      <Routes location={location} key={location.pathname}>
 
-      {/* 2. Protected Routes RENTER */}
-      <Route element={<ProtectedRoute allowedRoles={['RENTER', 'OWNER', 'ADMIN']} />}>
+        {/* Giữ nguyên 100% tất cả các Route bên trong từ code cũ của bạn */}
+        {/* 1. Standard Public Routes */}
         <Route element={<MainLayout />}>
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/checkout/bank-transfer" element={<BankTransferPage />} />
-          <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
-          <Route path="/checkout/vnpay-callback" element={<VnPayCallbackPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/messages" element={<MessagePage />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/products" element={<ProductCatalogPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
         </Route>
-      </Route>
 
-      {/* 3. Protected Routes áp dụng MENU SIDEBAR cho OWNER & ADMIN */}
-      <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
-        <Route element={<DashboardLayout />}> {/* Thay SimpleLayout bằng DashboardLayout */}
-          <Route path="/register-device" element={<RegisterDevicePage />} />
-          <Route path="/dashboard" element={<OwnerDashboard />} />
-          <Route path="/dashboard/inventory" element={<InventoryPage />} />
-          <Route path="/dashboard/device/:id/edit" element={<OwnerDeviceEditPage />} />
-          <Route path="/dashboard/orders" element={<OwnerOrdersPage />} />
-          {/*<Route path="/dashboard/calendar" element={<OwnerCalendarPage />} />*/}
-          <Route path="/dashboard/reviews" element={<OwnerReviewsPage />} />
+        {/* 2. Protected Routes RENTER */}
+        <Route element={<ProtectedRoute allowedRoles={['RENTER', 'OWNER', 'ADMIN']} />}>
+          <Route element={<MainLayout />}>
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/checkout/bank-transfer" element={<BankTransferPage />} />
+            <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+            <Route path="/checkout/vnpay-callback" element={<VnPayCallbackPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/messages" element={<MessagePage />} />
+          </Route>
         </Route>
-      </Route>
 
-      {/* 4. Protected Routes áp dụng MENU SIDEBAR riêng cho ADMIN */}
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-        <Route element={<DashboardLayout />}> {/* Thay SimpleLayout bằng DashboardLayout */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<AdminUsersPage />} />
-          <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
-          <Route path="/admin/devices" element={<AdminDevicesPage />} />
-          <Route path="/admin/categories" element={<AdminCategoriesPage />} />
-          <Route path="/admin/brands" element={<AdminBrandsPage />} />
-          <Route path="/admin/orders" element={<AdminOrdersPage />} />
-          <Route path="/admin/payments" element={<AdminPaymentsPage />} />
-          <Route path="/admin/issues" element={<AdminIssuesPage />} />
+        {/* 3. Protected Routes áp dụng MENU SIDEBAR cho OWNER & ADMIN */}
+        <Route element={<ProtectedRoute allowedRoles={['OWNER', 'ADMIN']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/register-device" element={<RegisterDevicePage />} />
+            <Route path="/dashboard" element={<OwnerDashboard />} />
+            <Route path="/dashboard/inventory" element={<InventoryPage />} />
+            <Route path="/dashboard/device/:id/edit" element={<OwnerDeviceEditPage />} />
+            <Route path="/dashboard/orders" element={<OwnerOrdersPage />} />
+            <Route path="/dashboard/reviews" element={<OwnerReviewsPage />} />
+          </Route>
         </Route>
-      </Route>
 
-      {/* 5. Auth Routes */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-    </Routes>
+        {/* 4. Protected Routes áp dụng MENU SIDEBAR riêng cho ADMIN */}
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
+            <Route path="/admin/devices" element={<AdminDevicesPage />} />
+            <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+            <Route path="/admin/brands" element={<AdminBrandsPage />} />
+            <Route path="/admin/orders" element={<AdminOrdersPage />} />
+            <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+            <Route path="/admin/issues" element={<AdminIssuesPage />} />
+          </Route>
+        </Route>
+
+        {/* 5. Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+
+      </Routes>
+    </AnimatePresence>
   );
 }
 

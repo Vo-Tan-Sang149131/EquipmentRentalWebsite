@@ -3,16 +3,21 @@ updates:
   - package-ecosystem: "maven"
     directory: "/apps/backend"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Vo-Tan-Sang149131"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     ignore:
       - update-types: [ "version-update:semver-major" ]
+    open-pull-requests-limit: 10
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
+    open-pull-requests-limit: 5

@@ -34,8 +34,9 @@ jobs:
 
       - name: Run Trivy Security Scanner
         id: trivy-scan
-        uses: aquasecurity/trivy-action@0.72.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
+          trivy-version: '0.72.0'
           scan-type: fs
           scan-ref: apps/backend
           format: table

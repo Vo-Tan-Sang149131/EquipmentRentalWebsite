@@ -1,75 +1,98 @@
+import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Tag } from 'lucide-react';
-import { motion } from 'motion/react';
 import type { LookupItem } from '@/features/product/types/product.types.ts';
 
-interface BrandsSectionProps {
+interface BrandsCarouselProps {
   brands: LookupItem[];
   isLoading: boolean;
 }
 
-export function BrandsSection({ brands, isLoading }: BrandsSectionProps) {
+export function BrandsCarousel({ brands, isLoading }: BrandsCarouselProps) {
+  const [offset, setOffset] = useState(0);
+  const [itemWidth, setItemWidth] = useState(0);
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  // Nhân đôi danh sách để tạo loop vô hạn
+  const loopBrands = [...brands, ...brands];
+
+  // Đo width item khi render lần đầu
+  useEffect(() => {
+    if (itemRef.current) {
+      const gap = 24; // khoảng cách giữa các item (gap-6 ~ 1.5rem = 24px)
+      setItemWidth(itemRef.current.offsetWidth + gap);
+    }
+  }, [brands]);
+
+  // Auto chạy
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setOffset((prev) => {
+        if (itemWidth && prev <= -brands.length * itemWidth) {
+          return 0; // reset khi chạy hết một vòng
+        }
+        return prev - 2; // dịch sang trái 2px mỗi tick
+      });
+    }, 30);
+    return () => clearInterval(interval);
+  }, [brands, itemWidth]);
+
+  const handlePrev = () => {
+    setOffset((prev) => prev + itemWidth);
+  };
+
+  const handleNext = () => {
+    setOffset((prev) => prev - itemWidth);
+  };
 
   return (
-    <>
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-10">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Thương hiệu nổi bật</h2>
-            <p className="text-slate-500 text-sm md:text-base">Khám phá các thương hiệu được yêu thích nhất</p>
-          </div>
-          <Link
-            to="/products"
-            className="text-blue-600 font-semibold flex items-center hover:underline text-sm md:text-base"
+    <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="flex items-center justify-between mb-10">
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Thương hiệu nổi bật</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handlePrev}
+            className="p-2 rounded-full border hover:bg-gray-100 transition"
           >
-            Tất cả <span className="hidden sm:inline ml-1">thương hiệu</span>
-            <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="p-2 rounded-full border hover:bg-gray-100 transition"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
         </div>
+      </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-24 bg-slate-200 animate-pulse rounded-xl"></div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {brands.map((brand: any, i: number) => (
-              <motion.div
-                key={brand.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <Link
-                  to={`/products?brands=${brand.name}`}
-                  className="group bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-xs hover:shadow-md hover:border-blue-300 transition-all text-center cursor-pointer"
-                >
-                  {/* Nếu có logo thì hiển thị */}
-                  {brand.logoUrl ? (
-                    <img
-                      src={brand.logoUrl}
-                      alt={brand.name}
-                      className="w-12 h-12 object-contain mx-auto mb-3 md:mb-4"
-                    />
-                  ) : (
-                    <div
-                      className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 md:mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      <Tag className="h-6 w-6" />
-                    </div>
-                  )}
-                  <span
-                    className="font-bold text-sm md:text-base text-slate-700 group-hover:text-blue-600 transition-colors line-clamp-1">
-              {brand.name}
-            </span>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </section>
-    </>
+      {isLoading ? (
+        <div className="flex gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-24 w-32 bg-slate-200 animate-pulse rounded-xl"></div>
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          className="flex gap-6"
+          animate={{ x: offset }}
+          transition={{ type: 'tween', ease: 'linear', duration: 0.3 }}
+        >
+          {loopBrands.map((brand, i) => (
+            <div
+              key={`${brand.id}-${i}`}
+              ref={i === 0 ? itemRef : null} // đo width item đầu tiên
+              className="shrink-0 w-32 sm:w-40 md:w-48 bg-white px-6 py-4 rounded-xl border border-slate-200 shadow-xs hover:shadow-md hover:border-blue-300 transition-all text-center cursor-pointer"
+            >
+              <Link to={`/products?brands=${brand.name}`}>
+                <span className="font-bold text-sm md:text-base text-slate-700 hover:text-blue-600 transition-colors">
+                  {brand.name}
+                </span>
+              </Link>
+            </div>
+          ))}
+        </motion.div>
+      )}
+    </section>
   );
 }

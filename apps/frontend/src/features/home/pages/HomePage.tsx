@@ -7,7 +7,7 @@ import { CategoriesSection } from '@/features/home/components/CategoriesSection.
 import { FeatureProducts } from '@/features/home/components/FeatureProducts.tsx';
 import { FeatureSection } from '@/features/home/components/FeatureSection.tsx';
 import { CTASection } from '@/features/home/components/CTASection.tsx';
-import { BrandsSection } from '@/features/home/components/BrandsSection.tsx';
+import { BrandsCarousel } from '@/features/home/components/BrandsSection.tsx';
 
 export function HomePage() {
   const { data: productsData, isLoading: isLoadingProducts } = useQuery({
@@ -56,7 +56,7 @@ export function HomePage() {
       <CTASection />
 
       {/* Brands Section */}
-      <BrandsSection brands={brands} isLoading={isLoadingBrands} />
+      <BrandsCarousel brands={brands} isLoading={isLoadingBrands} />
 
 
     </div>

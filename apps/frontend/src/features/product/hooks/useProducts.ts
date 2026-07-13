@@ -25,7 +25,7 @@ export function useProductFilter() {
     return min && max ? [Number(min), Number(max)] : DEFAULT_PRICE_RANGE;
   }, [searchParams]);
 
-  const sortField = (searchParams.get('sortField') as 'name' | 'price') || 'price';
+  const sortField = (searchParams.get('sortField') as 'name' | 'price') || 'name';
   const sortDirection = (searchParams.get('sortDirection') as 'asc' | 'desc') || 'asc';
 
   // --- 2. Helper method to update URL Params ---

@@ -5,6 +5,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { DEFAULT_PRICE_RANGE } from '@/features/product/constants/defaultValues.ts';
 import { useEffect, useState } from 'react';
+import { BrandFilters } from '@/features/product/components/BrandFilters.tsx';
 
 interface ProductFiltersProps {
   selectedCategory: string;
@@ -43,7 +44,6 @@ export function ProductFilters({
   });
 
   const dynamicCategories = ['All', ...categoriesData.map(c => c.name)];
-  const dynamicBrands = brandsData.map(b => b.name);
 
   const absoluteMin = serverPriceRange?.minPrice ?? DEFAULT_PRICE_RANGE[0];
   const absoluteMax = serverPriceRange?.maxPrice ?? DEFAULT_PRICE_RANGE[1];
@@ -62,15 +62,7 @@ export function ProductFilters({
       setLocalRange([absoluteMin, absoluteMax]);
     }
   }, [priceRange, serverPriceRange, absoluteMin, absoluteMax]);
-
-
-  const toggleBrand = (brand: string) => {
-    if (selectedBrands.includes(brand)) {
-      onBrandChange(selectedBrands.filter((b) => b !== brand));
-    } else {
-      onBrandChange([...selectedBrands, brand]);
-    }
-  };
+  
 
   if (isLoadingCats || isLoadingBrands || isLoadingPrice) {
     return <div className="text-gray-400 text-sm p-4">Đang tải bộ lọc...</div>;
@@ -128,23 +120,12 @@ export function ProductFilters({
       </div>
 
 
-      <div className="mt-4 pb-2 mb-4 text-left">
-        <h2 className="font-semibold text-sm text-gray-700 mb-2">Brand</h2>
-        <ul className="space-y-2">
-          {dynamicBrands.map((brand) => (
-            <div
-              key={brand}
-              onClick={() => toggleBrand(brand)}
-              className={`inline-block px-3 py-1 rounded-full border cursor-pointer text-sm
-              ${selectedBrands.includes(brand) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}
-              `}
-            >
-              {brand}
-            </div>
+      <BrandFilters
+        brands={brandsData}
+        selectedBrands={selectedBrands}
+        onBrandChange={onBrandChange}
+      />
 
-          ))}
-        </ul>
-      </div>
     </>
   );
 }

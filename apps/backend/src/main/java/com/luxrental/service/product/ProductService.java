@@ -156,10 +156,9 @@ public class ProductService {
             .min(BigDecimal::compareTo)
             .orElse(null);
 
-        // CHỈ CẬP NHẬT KHI CÓ GIÁ THỰC TẾ
+        // Only update if minPrice is not null
         product.setBasePrice(Objects.requireNonNullElse(minPrice, BigDecimal.ZERO));
 
-        // Chỉ gọi save đúng 1 lần duy nhất ở cuối hàm
         productRepository.save(product);
     }
 

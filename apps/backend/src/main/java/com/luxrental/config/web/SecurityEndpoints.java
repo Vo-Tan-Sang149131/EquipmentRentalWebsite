@@ -9,9 +9,7 @@ public final class SecurityEndpoints {
     public static final String[] PUBLIC_MATCHERS = {
         "/auth/**",
         "/products/**",
-        "/lookups/categories",
-        "/lookups/brands",
-        "/lookups/price-range",
+        "/lookups/**",
         "/devices/*/detail",
         "/swagger-ui/**",
         "/v3/api-docs/**",

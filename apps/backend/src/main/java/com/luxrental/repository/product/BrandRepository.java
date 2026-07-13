@@ -2,6 +2,7 @@ package com.luxrental.repository.product;
 
 import com.luxrental.controller.product.dto.core.response.LookupResponse;
 import com.luxrental.entity.common.Brand;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,5 +15,11 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
         "FROM Product p JOIN p.brand b " +
         "WHERE (:categoryName IS NULL OR p.category.name = :categoryName)")
     List<LookupResponse> findBrandsByCategory(@Param("categoryName") String categoryName);
+
+    @Query("SELECT new com.luxrental.controller.product.dto.core.response.LookupResponse(b.id, b.name) " +
+        "FROM Product p JOIN p.brand b " +
+        "GROUP BY b.id, b.name " +
+        "ORDER BY COUNT(p.id) DESC")
+    List<LookupResponse> findTopBrands(Pageable pageable);
 
 }

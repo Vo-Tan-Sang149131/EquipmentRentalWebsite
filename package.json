@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@types/react-google-recaptcha": "^2.1.9",
-    "minimatch": "^5.1.9",
+    "minimatch": "^10.2.5",
     "rimraf": "^6.1.3"
   }
 }
